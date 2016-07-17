@@ -3,10 +3,9 @@
  * Group
  *
  * project	Plugin Manager
- * version: 3.0.3
+ * version: 5.0.0
  * Author: Sujin 수진 Choi
- * Author URI: https://www.facebook.com/WP-developer-Sujin-1182629808428000/
- *
+ * Author URI: http://www.sujinc.com/
 */
 
 namespace PIGPR;
@@ -18,87 +17,71 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class Group {
-	private $is_group_query;
-	private $default_color = '#666666';
+	const DEFAULT_COLOR = '#666666';
 
-	private $plugin_groups;
-	private $plugin_groups_match;
-	private $groups_plugin_match;
+	private $is_group_query, $plugin_groups, $plugin_groups_match, $groups_plugin_match, $num_all_plugins;
 
-	/**
-	 * Constructor. Hooks all interactions to initialize the class.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
 	function __construct() {
-		$this->upgrade();
-
 		$this->plugin_groups = get_option( 'plugin_groups' );
 		$this->plugin_groups_match = get_option( 'plugin_groups_match' );
 		$this->groups_plugin_match = get_option( 'groups_plugin_match' );
 
+/* 		$this->is_group_query = !empty( $_GET['plugin_group'] ); */
+
 		# AJAX
 		add_action( 'wp_ajax_PIGPR_CREATE_GROUP', array( $this, 'create_group' ) );
 		add_action( 'wp_ajax_PIGPR_INPUT_INTO_GROUP', array( $this, 'input_into_group' ) );
-		add_action( 'wp_ajax_PIGPR_DELETE_FROM_GROUP', array( $this, 'delete_from_group' ) );
+		add_action( 'wp_ajax_PIGPR_DELETE_FROM_GROUP', array( $this, 'AjaxDeleteFromGroup' ) );
 		add_action( 'wp_ajax_PIGPR_SET_GROUP_COLOR', array( $this, 'set_group_color' ) );
 
-		add_action( 'init', array( $this, 'init' ) );
-	}
-
-	public function init() {
-		$this->is_group_query = !empty( $_GET['plugin_group'] );
-
-		# Hooks
-		add_filter( "views_plugins", array( $this, 'views_plugins' ) );
-		add_filter( "views_plugins-network", array( $this, 'views_plugins' ) );
-
 		// Group Buttons
-		add_filter( 'network_admin_plugin_action_links' , array( $this, 'plugin_action_link' ), 15, 4 );
-		add_filter( 'plugin_action_links' , array( $this, 'plugin_action_link' ), 15, 4 );
-		add_action( 'pre_current_active_plugins', array( $this, 'print_modal' ) );
+		add_filter( 'network_admin_plugin_action_links' , array( $this, 'PrintGroupButton' ), 15, 4 );
+		add_filter( 'plugin_action_links' , array( $this, 'PrintGroupButton' ), 15, 4 );
+		add_action( 'pre_current_active_plugins', array( $this, 'PrintModal' ) );
 
-		add_filter( "plugin_row_meta", array( $this, 'print_groups' ), 15, 3 );
+		// Data Handling
+		add_filter( 'all_plugins', array( $this, 'ModifyAllPlugins' ), 20 );
+
+		// Subsubsub
+		add_filter( "views_plugins", array( $this, 'ModifySubsubsub' ) );
+		add_filter( "views_plugins-network", array( $this, 'ModifySubsubsub' ) );
+
+		// On Description Column
+		add_filter( "plugin_row_meta", array( $this, 'PrintGroupsOnDescription' ), 15, 3 );
+
+		// Group View Redirection
+// 		add_action( 'init', array( $this, 'GroupViewRedirection' ) );
 
 		if ( $this->is_group_query ) {
-			add_filter( 'all_plugins', array( $this, 'all_plugins' ) );
-			add_action( 'admin_footer', array( $this, 'print_group_information' ) );
-			add_action( 'wp_loaded', array( $this, 'delete_group' ) );
+			add_action( 'admin_footer', array( $this, 'PrintGroupInformation' ) );
+			add_action( 'wp_loaded', array( $this, 'ActionDeleteGroup' ) );
 		}
 	}
 
-	/**
-	 * Filter[plugin_action_links] : Group Buttons
-	 *
-	 * @since 1.5.2
-	 * @access public
-	 *
-	 */
-	public function plugin_action_link( $actions, $plugin_file, $plugin_data, $a ) {
-		$actions['group'] = sprintf( '<a href="#" class="button-grouping" data-id="%s"><span class="dashicons dashicons-groups"></span> %s</a>',
+/*
+	public function GroupViewRedirection() {
+		if ( isset( $_POST[ 'gm-plugin' ] ) && !empty( $_POST[ 'gm-plugin' ] ) ) {
+
+			$arg = implode( 'plugin_grouper_url_needle', $_POST[ 'gm-plugin' ] );
+			wp_redirect( add_query_arg( 'plugin_group', $arg ) );
+			die;
+		}
+	}
+*/
+
+	public function PrintGroupButton( $actions, $plugin_file, $plugin_data, $a ) {
+		$text_class = ( $GLOBALS[ 'PIGPR' ]->ScreenOption->hide_text ) ? 'hidden' : '';
+
+		$actions['group'] = sprintf( '<a href="#" class="button-grouping button-plugin-manager" data-id="%s"><span class="dashicons dashicons-groups"></span><span class="text %s">%s</span></a>',
 			( isset( $plugin_data[ 'slug' ] ) && $plugin_data[ 'slug' ] ) ? $plugin_data[ 'slug' ] : sanitize_title( $plugin_data['Name'] ),
+			$text_class,
 			__( 'Group', PIGPR_TEXTDOMAIN )
 		);
 
 		return $actions;
 	}
 
-	/**
-	 * Filter[plugin_row_meta] : Print Groups set on each Plugins.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param: (array) $plugin_meta, (string) $plugin_file, (array) $plugin_data
-	 * @return: (array) $plugin_meta
-	 *
-	 * see	/wp-admin/includes/class-wp-list-table.php
-	 */
-	public function print_groups( $plugin_meta, $plugin_file, $plugin_data ) {
-		$group_info = get_option( 'plugin_groups' );
-		$groups = get_option( 'plugin_groups_match' );
-
+	public function PrintGroupsOnDescription( $plugin_meta, $plugin_file, $plugin_data ) {
 		$slug = ( isset( $plugin_data[ 'slug' ] ) && $plugin_data[ 'slug' ] ) ? $plugin_data[ 'slug' ] : sanitize_title( $plugin_data['Name'] );
 
 		echo '<div class="groups">';
@@ -116,25 +99,14 @@ class Group {
 		return $plugin_meta;
 	}
 
-	/**
-	 * Action[admin_footer] : Print Selected Group Name in Input From.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
-	public function print_group_information() {
+	// On Footer
+	public function PrintGroupInformation() {
 		$group_key = $_GET['plugin_group'];
 
 		printf( '<input type="hidden" id="plugin_group_name" value="%s" />', $this->plugin_groups[$group_key]['name'] );
 	}
 
-	/**
-	 * Action[init] : Delete Selected Group.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
-	public function delete_group() {
+	public function ActionDeleteGroup() {
 		if ( empty( $_GET['action'] ) || empty( $_GET['group_id'] ) ) return false;
 
 		$action = $_GET['action'];
@@ -163,12 +135,6 @@ class Group {
 		die();
 	}
 
-	/**
-	 * Ajax: Create Group.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
 	public function create_group() {
 		$group_name = $_POST[ 'group_name' ];
 		$plugin_id = $_POST[ 'plugin_id' ];
@@ -176,7 +142,7 @@ class Group {
 		$group_id = sanitize_title( $group_name );
 
 		if ( $group_id && empty( $this->plugin_groups[$group_id] ) ) {
-			$bgcolor = apply_filters( 'plugin_group_default_color', $this->default_color );
+			$bgcolor = apply_filters( 'plugin_group_default_color', $this::DEFAULT_COLOR );
 			$color = $this->get_contrast_color( $bgcolor );
 
 			$this->plugin_groups[$group_id] = array(
@@ -200,12 +166,6 @@ class Group {
 		wp_die();
 	}
 
-	/**
-	 * Ajax: Input Plugin into Group.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
 	public function input_into_group( $group_id = false, $group_name = false, $plugin_id = false, $echo = true ) {
 		$group_id = ( !$group_id ) ? $_POST[ 'group_id' ] : $group_id;
 		$group_name = ( !$group_name ) ? $_POST[ 'group_name' ] : $group_name;
@@ -237,39 +197,32 @@ class Group {
 		wp_die();
 	}
 
-	/**
-	 * Ajax: Delete Plugin from Group.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
-	public function delete_from_group() {
+	public function AjaxDeleteFromGroup() {
 		$group_id = $_POST[ 'group_id' ];
 		$group_name = $_POST[ 'group_name' ];
 		$plugin_id = $_POST[ 'plugin_id' ];
 
 		unset( $this->plugin_groups_match[$plugin_id][$group_id] );
+		if ( !count( $this->plugin_groups_match[$plugin_id] ) )
+			unset( $this->plugin_groups_match[$plugin_id] );
+
 		update_option( 'plugin_groups_match', $this->plugin_groups_match );
 
 		unset( $this->groups_plugin_match[$group_id][$plugin_id] );
+		if ( !count( $this->groups_plugin_match[$group_id] ) )
+			unset( $this->groups_plugin_match[$group_id] );
+
 		update_option( 'groups_plugin_match', $this->groups_plugin_match );
 
 		wp_die();
 	}
 
-	/**
-	 * Ajax: Set Group Color.
-	 *
-	 * @since 2.0.0
-	 * @access public
-	 */
 	public function set_group_color() {
 		$group_id = $_POST['group_id'];
 		$color = $_POST['color'];
 
 		if ( !isset( $this->plugin_groups[$group_id] ) ) wp_die();
 
-		if ( !is_array( $this->plugin_groups[$group_id] ) ) $this->plugin_groups[$group_id] = $this->upgrade( $group_id );
 		$this->plugin_groups[$group_id]['color'] = $color;
 
 		update_option( 'plugin_groups', $this->plugin_groups );
@@ -282,16 +235,38 @@ class Group {
 		wp_die();
 	}
 
-	/**
-	 * Filter[all_plugins]: Change Plugin List Items on Group View Screen.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param: (array) $plugins
-	 * @return: (array) $plugins
-	 */
-	public function all_plugins( $plugins ) {
+	public function ModifyAllPlugins( $plugins ) {
+		$this->num_all_plugins = count( $plugins );
+
+		if ( !empty( $_GET[ 'plugin_group' ] ) && $_GET[ 'plugin_group' ] == 'not_in_any_groups' ) {
+			$plugins_ = $plugins;
+
+			foreach( $plugins as $key => $plugin ) {
+				foreach( $this->plugin_groups_match as $key_opt => $plugin_opt ) {
+					if ( strstr( $key, $key_opt . '/' ) !== false )
+						unset( $plugins_[ $key ] );
+
+					if ( sanitize_title( $plugin[ 'Name' ] ) == $key_opt )
+						unset( $plugins_[ $key ] );
+				}
+			}
+			return $plugins_;
+
+		} else if ( !empty( $_GET[ 'plugin_group' ] ) ) {
+			$plugins_ = array();
+
+			foreach( $this->groups_plugin_match[ $_GET[ 'plugin_group' ] ] as $group_key => $value ) {
+				foreach( $plugins as $key => $plugin ) {
+					if ( strstr( $key, $group_key . '/' ) !== false )
+						$plugins_[ $key ] = $plugin;
+
+					if ( sanitize_title( $plugin[ 'Name' ] ) == $group_key )
+						$plugins_[ $key ] = $plugin;
+				}
+			}
+			return $plugins_;
+		}
+/*
 		if ( $this->is_group_query ) {
 			$plugins_ = array();
 			$plugin_info = get_site_transient( 'update_plugins' );
@@ -312,37 +287,58 @@ class Group {
 
 			return $plugins_;
 		}
+*/
 
 		return $plugins;
 	}
 
-	/**
-	 * Action[pre_current_active_plugins]: Print Basic Grouping Option Element.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
-	public function print_modal() {
-		$groups = $this->plugin_groups;
+	public function PrintModal() {
 		include_once( PIGPR_TEMPLATE_DIR . 'modal_table.php' );
 	}
 
-	/**
-	 * Filter[views_plugins] : Adding Plugin Category on Table Filter.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param: (array) $views List Tabs
-	 * @return: (array) List Tabs
-	 *
-	 * see	/wp-admin/includes/class-wp-list-table.php
-	 */
-	public function views_plugins( $views ) {
-		$groups = $this->plugin_groups;
+	public function ModifySubsubsub( $views ) {
+		if ( isset( $_GET[ 'plugin_group' ] ) ) {
 
-		if ( empty( $groups ) ) return $views;
-		if ( $this->is_group_query ) {
+			foreach( $views as $key => &$html ) {
+				$doc = new \DOMDocument();
+				$doc->loadHTML( $html );
+
+				foreach( $doc->getElementsByTagName( 'a' ) as $link) {
+					$link_new = add_query_arg( 'plugin_group', $_GET[ 'plugin_group' ], $link->getAttribute('href') );
+					$link->setAttribute( 'href', $link_new );
+				}
+
+				$html = $doc->saveHTML();
+			}
+		}
+
+		$num_not_in_groups = $this->num_all_plugins - count( $this->plugin_groups_match );
+		$groups = array();
+
+		$class = ( !$_GET[ 'plugin_group' ] ) ? 'current' : '';
+		$groups[ 'all in any groups' ] = sprintf( '<li class="group"><a href="plugins.php" class="%s">All <span class="count">(%s)</span></a>', $class, $this->num_all_plugins );
+		$class = ( $_GET[ 'plugin_group' ] == 'not_in_any_groups' ) ? 'current' : '';
+		$groups[ 'not in any groups' ] = sprintf( '<li class="group"><a href="plugins.php?plugin_group=not_in_any_groups" class="%s">None <span class="count">(%s)</span></a>', $class, $num_not_in_groups );
+
+		foreach( $this->plugin_groups as $key => $value ) {
+			$background_color = $value['color'];
+
+		$class = ( $_GET[ 'plugin_group' ] == $key ) ? 'current' : '';
+			$groups[ $key ] = sprintf( '<li class="group"><a href="plugins.php?plugin_group=%s" class="%s"><span class="colour" style="background-color:%s"></span>%s <span class="count">(%s)</span></a>', $key, $class, $background_color, $value['name'], count( $this->groups_plugin_match[ $key ] ) );
+		}
+
+		?>
+		<ul class='subsubsub plugin-groups'>
+			<li><strong><?php _e( 'Groups', PIGPR_TEXTDOMAIN ) ?></strong> |</li>
+			<?php echo implode( " |</li>\n", $groups ) ?></li>
+		</ul>
+
+		<div class='clear'></div>
+		<?php
+
+
+
+/*
 			unset($views);
 			$views['all'] = sprintf( '<a href="plugins.php?plugin_status=all">%s</a>', __( 'All', PIGPR_TEXTDOMAIN ) );
 
@@ -353,21 +349,12 @@ class Group {
 
 				$views[$key] = sprintf( '<a href="plugins.php?plugin_group=%s" class="%s group" data-color="%s" style="background-color:%s; color:%s">%s</a>', $key, $class, $value['color'], $background_color, $color, $value['name'] );
 			}
+*/
+/*
 		} else {
-			echo "<ul class='subsubsub plugin-groups'>\n";
-			printf( "<li><strong>%s</strong> |</li>", __( 'Groups', PIGPR_TEXTDOMAIN ) );
-
-			foreach( $groups as $key => $value ) {
-				$background_color = $value['color'];
-				$color = $this->get_contrast_color( $background_color );
-
-				$groups[ $key ] = sprintf( '<li class="group"><a href="plugins.php?plugin_group=%s" data-id="%s" data-bgcolor="%s" data-color="%s" class="group" style="background-color:%s; color:%s">%s</a>', $key, $key, $background_color, $color, $background_color, $color, $value['name'] );
-			}
-			echo implode( " |</li>\n", $groups ) . "</li>\n";
-			echo "</ul>";
-			echo "<div class='clear'></div>";
 
 		}
+*/
 
 		return $views;
 	}
@@ -414,32 +401,30 @@ class Group {
 		return ( $contrast < 128 ) ? "#FFFFFF" : "#000000";
 	}
 
-	/**
-	 * upgrade
-	 *
-	 * @since 2.0.0
-	 * @access private
-	 *
-	 */
-	private function upgrade() {
-		$current_version = get_option( 'PIGPR_VERSION_NUM' );
+	public function AddOptionTextMode( $screen_settings ) {
+		$plugin_group_var = ( isset( $_GET[ 'plugin_group' ] ) ) ? explode( 'plugin_grouper_url_needle', $_GET[ 'plugin_group' ] ) : false;
 
-		if ( version_compare( $current_version, '2.0.0', '<' ) ) {
-			update_option( 'PIGPR_VERSION_NUM', PIGPR_VERSION_NUM );
+		ob_start();
+		?>
+		<fieldset class="screen-options">
+			<legend>
+				<?php _e( 'Group', PIGPR_TEXTDOMAIN ) ?>
+				<?php if ( $plugin_group_var ) : ?>
+				&nbsp;&nbsp;&nbsp;
+				<label><button name="gm-show_all" id="group-manager-group-show_all" value="gm-text"> Show All</button>
+				<?php endif; ?>
+			</legend>
 
-			$groups = get_option( 'plugin_groups' );
-			if ( $groups ) {
-				foreach( $groups as &$group ) {
-					if ( !is_array( $group ) ) {
-						$group = array(
-							'color' => '#666666',
-							'name' => $group
-						);
-					}
-				}
-			}
+			<?php foreach( $this->plugin_groups as $key => $group ) : ?>
+			<label>
+				<input name="gm-plugin[<?php echo $key ?>]" type="checkbox" id="group-manager-plugin-<?php echo $key ?>" value="<?php echo $key ?>" <?php echo in_array( $key, $plugin_group_var ) ? 'checked="checked"' : '' ?>>
+					<?php echo $group[ 'name' ] . ' (' . count( $this->groups_plugin_match[ $key ] ) . ')' ?>
+			</label>&nbsp;&nbsp;&nbsp;
+			<?php endforeach; ?>
+		</fieldset>
+		<?php
+		$screen_settings .= ob_get_clean();
 
-			update_option( 'plugin_groups', $groups );
-		}
+		return $screen_settings;
 	}
 }

@@ -31,16 +31,6 @@ jQuery( document ).ready( function( $ ) {
 	}
 	// 그룹 보기 모드일 경우 타이틀 바꾸기 -->
 
-	function getUrlParameter(sParam) {
-		var sPageURL = window.location.search.substring(1);
-		var sURLVariables = sPageURL.split('&');
-		for (var i = 0; i < sURLVariables.length; i++)  {
-			var sParameterName = sURLVariables[i].split('=');
-			if (sParameterName[0] === sParam)  {
-				return sParameterName[1];
-			}
-		}
-	}
 	function escape_special_character( text ) {
 		text = text.replace( /([ #;?%&,.+*~\':"!^$[\]()=>|\/@])/g,'\\$1' );
 		return text;
@@ -123,6 +113,7 @@ jQuery( document ).ready( function( $ ) {
 			var group_name = $(this).attr( 'data-name' );
 
 			var data = {
+				'mode' : 'Plugin Manager',
 				'plugin_id' : plugin_id,
 				'group_id' : group_id,
 				'group_name' : group_name
@@ -195,6 +186,7 @@ jQuery( document ).ready( function( $ ) {
 				var plugin_id = $( '.plugin_grouper_wrap' ).attr( 'data-id' );
 				var data = {
 					'action': 'PIGPR_CREATE_GROUP',
+					'mode' : 'Plugin Manager',
 					'group_name' : $( '.wp-list-table.plugins .inp-create_group' ).val(),
 					'plugin_id' : plugin_id
 				};
@@ -299,3 +291,4 @@ jQuery( document ).ready( function( $ ) {
 	}
 	// 플러그인 선택했을 때 체크박스 체크하기 -->
 });
+

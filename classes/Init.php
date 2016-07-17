@@ -3,10 +3,9 @@
  * Init
  *
  * project	Plugin Manager
- * version: 4.0.0
+ * version: 5.0.0
  * Author: Sujin 수진 Choi
- * Author URI: https://www.facebook.com/WP-developer-Sujin-1182629808428000/
- *
+ * Author URI: http://www.sujinc.com/
 */
 
 namespace PIGPR;
@@ -17,62 +16,44 @@ if ( !defined( "ABSPATH" ) ) {
 	exit();
 }
 
-class  Init {
-	private $Group, $Lock, $AdminPage;
-	private $version = PIGPR_VERSION_NUM;
+class Init {
+	private $Group, $Lock, $Hide, $AdminPage;
+	public $ScreenOption;
 
 	function __construct() {
-		if ( !is_admin() ) return false;
+		register_activation_hook( PIGPR_PLUGIN_DIR . PIGPR_PLUGIN_FILE_NAME , array( $this, "Upgrade" ) );
 
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-			$this->Group = new Group();
-			$this->Lock = new Lock();
-		}
+		if ( !is_admin() )
+			return false;
 
-		if ( is_multisite() ) {
-		# Single Site
-			add_action( 'plugins_loaded', array( $this, 'activateMultisite' ) );
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_POST[ 'mode' ] ) && $_POST[ 'mode' ] == 'Plugin Manager' )
+			$this->ActivateObjects();
 
-		} else {
-		# Multi Site
-			global $pagenow;
-			if ( $pagenow !== "plugins.php" ) return false;
-
-			$this->Group = new Group();
-			$this->Lock = new Lock();
-
-			# 텍스트도메인
-			add_action( 'plugins_loaded', array( $this, 'LoadTextDomain' ) );
-	 		add_action( 'admin_enqueue_scripts', array( $this, 'EnqueueScripts' ) );
-			add_filter( 'wp_redirect', array( $this, 'wp_redirect' ) );
-		}
+		if ( is_multisite() )
+			add_action( 'plugins_loaded', array( $this, 'ActivatePlugin' ) );
+		else
+			$this->ActivatePlugin();
 	}
 
-	public function activateMultisite() {
-//		if ( is_network_admin() ) {
-//			$this->CreateNetworkAdminPage();
-//		}
+	private function ActivateObjects() {
+		$this->Group = new Group();
+/*
+		$this->Lock = new Lock();
+		$this->Hide = new Hide();
+*/
+		$this->ScreenOption = new ScreenOption();
+	}
 
+	public function ActivatePlugin() {
 		global $pagenow;
 		if ( $pagenow !== "plugins.php" ) return false;
 
-		$this->Group = new Group();
-		$this->Lock = new Lock();
+		$this->ActivateObjects();
 
 		# 텍스트도메인
 		add_action( 'plugins_loaded', array( $this, 'LoadTextDomain' ) );
- 		add_action( 'admin_enqueue_scripts', array( $this, 'EnqueueScripts' ) );
-		add_filter( 'wp_redirect', array( $this, 'wp_redirect' ) );
-	}
-
-	private function CreateNetworkAdminPage() {
-		$this->AdminPage = new \WE\AdminPage\Options( 'Plugin Manager' );
-		$this->AdminPage->position = 'Plugins';
-
-		$this->AdminPage->version = '4.0.0';
-
-		$this->AdminPage->setting = 'Allow Managing';
-		$this->AdminPage->setting->type = 'checkbox';
+		add_action( 'admin_enqueue_scripts', array( $this, 'EnqueueScripts' ) );
+		add_filter( 'wp_redirect', array( $this, 'WP_Redirect' ) );
 	}
 
 	public function LoadTextDomain() {
@@ -80,29 +61,69 @@ class  Init {
 		load_plugin_textdomain( PIGPR_TEXTDOMAIN, 'wp-content/plugins/' . $lang_dir, $lang_dir );
 	}
 
-	# 스크립트 & 스타일
 	public function EnqueueScripts() {
 		# Adding Grouping Actions on Dropdown Menu
-		wp_enqueue_script( 'plugin-grouper-group', PIGPR_ASSETS_URL . 'script/min/group-min.js', array( 'jquery' ), '4.0.0' );
-		wp_enqueue_script( 'plugin-grouper-lock', PIGPR_ASSETS_URL . 'script/min/lock-min.js', array( 'jquery' ), '4.0.0' );
+		wp_enqueue_script( 'plugin-grouper-group', PIGPR_ASSETS_URL . 'script/min/plugin_grouper-min.js', array( 'jquery' ), '4.0.0' );
 
 		wp_enqueue_style( 'plugin-grouper', PIGPR_ASSETS_URL . 'css/plugin-grouper.css' );
 
 		wp_enqueue_script( 'spectrum', PIGPR_VENDOR_URL . 'spectrum.js', array( 'jquery' ), '4.0.0' );
 		wp_enqueue_style( 'spectrum', PIGPR_VENDOR_URL . 'spectrum.css' );
 
-		# Localization
+		# Localization // objectL10n.delete_group
 		wp_localize_script( 'plugin-grouper-group', 'objectL10n', array(
 			'plugin_group'  => __( 'Plugin Group', PIGPR_TEXTDOMAIN ),
 			'delete_group' => __( 'Delete Group', PIGPR_TEXTDOMAIN ),
+			'show' => __( 'Show', PIGPR_TEXTDOMAIN ),
+			'hide' => __( 'Hide', PIGPR_TEXTDOMAIN ),
+			'lock' => __( 'Lock', PIGPR_TEXTDOMAIN ),
+			'unlock' => __( 'Unlock', PIGPR_TEXTDOMAIN ),
 		) );
 	}
 
-	public function wp_redirect( $location ) {
+	public function WP_Redirect( $location ) {
 		if ( isset( $_REQUEST['plugin_group'] ) && isset( $_REQUEST['action'] ) && $_REQUEST['action'] !== 'delete_group' ) {
 			$location = add_query_arg( 'plugin_group', $_REQUEST['plugin_group'], $location );
 		}
+
 		return $location;
+	}
+
+	private function Upgrade() {
+		$current_version = get_option( 'PIGPR_VERSION_NUM' );
+
+		// From Version 1.0.0
+		if ( version_compare( $current_version, '2.0.0', '<' ) ) {
+			$groups = get_option( 'plugin_groups' );
+
+			if ( $groups ) {
+				foreach( $groups as &$group ) {
+					if ( !is_array( $group ) ) {
+						$group = array(
+							'color' => '#666666',
+							'name' => $group
+						);
+					}
+				}
+			}
+
+			update_option( 'plugin_groups', $groups );
+		}
+
+		// Delete Empty Array
+		$plugin_groups_match = get_option( 'plugin_groups_match' );
+		$plugin_groups_match_ = array();
+
+		foreach( $plugin_groups_match as $key => $value ) {
+			if ( count( $value ) )
+				$plugin_groups_match_[ $key ] = $value;
+		}
+
+		update_option( 'plugin_groups_match', $plugin_groups_match_ );
+
+		update_option( 'PIGPR_VERSION_NUM', PIGPR_VERSION_NUM );
+
+
 	}
 }
 

@@ -3,9 +3,9 @@
  * Lock
  *
  * project	Plugin Manager
- * version: 3.0.1
+ * version: 4.0.0
  * Author: Sujin 수진 Choi
- * Author URI: https://www.facebook.com/WP-developer-Sujin-1182629808428000/
+ * Author URI: http://www.sujinc.com/
  *
 */
 
@@ -17,24 +17,16 @@ if ( !defined( "ABSPATH" ) ) {
 	exit();
 }
 
-class  Lock {
-	/**
-	 * Constructor. Hooks all interactions to initialize the class.
-	 *
-	 * @since 2.0.0
-	 * @access public
-	 */
+class Lock {
 	function __construct() {
-		add_action( 'wp_ajax_PIGPR_LOCK', array( $this, 'lock' ) );
-		add_action( 'wp_ajax_PIGPR_UNLOCK', array( $this, 'unlock' ) );
+		add_action( 'wp_ajax_PIGPR_LOCK', array( $this, 'Lock' ) );
+		add_action( 'wp_ajax_PIGPR_UNLOCK', array( $this, 'Unlock' ) );
 
-		global $pagenow;
-		if ( $pagenow !== "plugins.php" ) return false;
-
-		add_action( 'wp_loaded', array( $this, 'wp_loaded' ) );
+		add_filter( 'network_admin_plugin_action_links' , array( $this, 'AddActionLink' ), 15, 4 );
+		add_filter( 'plugin_action_links' , array( $this, 'AddActionLink' ), 15, 4 );
 	}
 
-	public function lock() {
+	public function Lock() {
 		$plugin_file = $_POST['plugin_file'];
 		$locked = get_option( 'plugin_locked' );
 		if ( is_array( $locked ) && isset( $locked[$plugin_file] ) ) wp_die();
@@ -44,7 +36,7 @@ class  Lock {
 		wp_die();
 	}
 
-	public function unlock() {
+	public function Unlock() {
 		$plugin_file = $_POST['plugin_file'];
 		$locked = get_option( 'plugin_locked' );
 		if ( is_array( $locked ) && !isset( $locked[$plugin_file] ) ) wp_die();
@@ -54,17 +46,26 @@ class  Lock {
 		wp_die();
 	}
 
-	public function wp_loaded() {
- 		add_filter( 'network_admin_plugin_action_links' , array( $this, 'plugin_action_link' ), 15, 4 );
-		add_filter( 'plugin_action_links' , array( $this, 'plugin_action_link' ), 15, 4 );
-	}
+	public function AddActionLink( $actions, $plugin_file, $plugin_data, $a ) {
+		$text_class = ( $GLOBALS[ 'PIGPR' ]->ScreenOption->hide_text ) ? 'hidden' : '';
 
-	public function plugin_action_link( $actions, $plugin_file, $plugin_data, $a ) {
- 		if ( $this->is_locked( $plugin_file ) ) {
-			$actions['lock'] = sprintf( '<a href="#" class="button-unlock" data-id="%s" data-plugin_file="%s"><span class="dashicons dashicons-unlock"></span> %s</a>', sanitize_title( $plugin_data['Name'] ), $plugin_file, __( 'Unlock', PIGPR_TEXTDOMAIN ) );
- 		} else {
-			$actions['lock'] = sprintf( '<a href="#" class="button-lock" data-id="%s" data-plugin_file="%s"><span class="dashicons dashicons-lock"></span> %s</a>', sanitize_title( $plugin_data['Name'] ), $plugin_file, __( 'Lock', PIGPR_TEXTDOMAIN ) );
- 		}
+		if ( $this->isLocked( $plugin_file ) ) {
+			$actions['lock'] = sprintf(
+				'<a href="#" class="button-unlock button-plugin-manager" data-id="%s" data-plugin_file="%s"><span class="dashicons dashicons-unlock"></span><span class="text %s">%s</span></a>',
+				sanitize_title( $plugin_data['Name'] ),
+				$plugin_file,
+				$text_class,
+				__( 'Unlock', PIGPR_TEXTDOMAIN )
+			);
+		} else {
+			$actions['lock'] = sprintf(
+				'<a href="#" class="button-lock button-plugin-manager" data-id="%s" data-plugin_file="%s"><span class="dashicons dashicons-lock"></span><span class="text %s">%s</span></a>',
+				sanitize_title( $plugin_data['Name'] ),
+				$plugin_file,
+				$text_class,
+				__( 'Lock', PIGPR_TEXTDOMAIN )
+			);
+		}
 
 		return $actions;
 	}
@@ -76,7 +77,7 @@ class  Lock {
 	 * @access public
 	 *
 	 */
-	private function is_locked( $plugin_file ) {
+	private function isLocked( $plugin_file ) {
 		$locked = get_option( 'plugin_locked' );
 		if ( is_array( $locked ) && !empty( $locked[$plugin_file] ) ) return true;
 

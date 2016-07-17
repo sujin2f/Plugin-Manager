@@ -4,9 +4,9 @@
 	<?php do_action( 'before_plugin_group' ) ?>
 
 	<ul>
-		<?php if ( $groups ) : ?>
+		<?php if ( $this->plugin_groups ) : ?>
 			<?php
-			foreach( $groups as $key => $value ) :
+			foreach( $this->plugin_groups as $key => $value ) :
 				if ( !is_array( $value ) ) {
 					$value = $this->upgrade( $key );
 				}

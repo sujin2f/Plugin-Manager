@@ -1,3 +1,14 @@
+/**
+ *
+ * LESS
+ *
+ * project	Plugin Manager
+ * version: 5.0.0
+ * Author: Sujin 수진 Choi
+ * Author URI: http://www.sujinc.com/
+ *
+*/
+
 .subsubsub a.group {
 	display:inline-block;
 	background-color:#EEEEEE;
@@ -8,12 +19,26 @@
 
 table.plugins {
 	tr {
+		// 숨김 플러그인 보기
+		&.hidden.show {
+			display: table-row;
+
+			td {
+				color: gray;
+
+				p {
+					color: gray;
+				}
+			}
+		}
+
 		th.check-column {
 			input {
 				display:none;
 			}
 		}
 
+/*
 		td.plugin-title {
 			.row-actions {
 				.lock .dashicons-unlock {
@@ -33,6 +58,7 @@ table.plugins {
 				}
 			}
 		}
+*/
 
 		td.column-description {
 			.groups {

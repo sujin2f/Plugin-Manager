@@ -10,6 +10,7 @@ jQuery( document ).ready( function( $ ) {
 
 			var data = {
 				'action' : 'PIGPR_LOCK',
+				'mode' : 'Plugin Manager',
 				'plugin_file' : plugin_file
 			};
 
@@ -26,6 +27,7 @@ jQuery( document ).ready( function( $ ) {
 
 			var data = {
 				'action' : 'PIGPR_UNLOCK',
+				'mode' : 'Plugin Manager',
 				'plugin_file' : plugin_file
 			};
 
@@ -40,6 +42,8 @@ jQuery( document ).ready( function( $ ) {
 	// Binding 개별 항목 액션 -->
 
 	function lock( $obj ) {
+		var text_hidden = $obj.find( '.text' ).hasClass( 'hidden' ) ? 'hidden' : '';
+
 		$obj.parents( 'tr' ).addClass( 'locked' );
 		$obj.parents( 'tr' ).find( 'th.check-column input[type="checkbox"]' ).attr( 'type', 'hidden' );
 		$obj.parents( 'tr' ).find( 'th.check-column input' ).hide();
@@ -50,13 +54,15 @@ jQuery( document ).ready( function( $ ) {
 		$obj.parents( 'tr' ).find( '.row-actions .deactivate' ).hide();
 		$obj.parents( 'tr' ).find( '.row-actions .delete' ).hide();
 
-		$obj.html( '<span class="dashicons dashicons-unlock"></span> Unlock' );
+		$obj.html( '<span class="dashicons dashicons-unlock"></span><span class="text  ' + text_hidden + '">' + objectL10n.unlock + '</span>' );
 
 		$obj.removeClass( 'button-lock' ).addClass( 'button-unlock' );
 		bind_actions();
 	}
 
 	function unlock( $obj ) {
+		var text_hidden = $obj.find( '.text' ).hasClass( 'hidden' ) ? 'hidden' : '';
+
 		$obj.parents( 'tr' ).removeClass( 'locked' );
 		$obj.parents( 'tr' ).find( 'th.check-column input[type="hidden"]' ).attr( 'type', 'checkbox' );
 		$obj.parents( 'tr' ).find( 'th.check-column input' ).show();
@@ -67,7 +73,7 @@ jQuery( document ).ready( function( $ ) {
 		$obj.parents( 'tr' ).find( '.row-actions .deactivate' ).show();
 		$obj.parents( 'tr' ).find( '.row-actions .delete' ).show();
 
-		$obj.html( '<span class="dashicons dashicons-lock"></span> Lock' );
+		$obj.html( '<span class="dashicons dashicons-lock"></span><span class="text  ' + text_hidden + '">' + objectL10n.lock + '</span>' );
 
 		$obj.removeClass( 'button-unlock' ).addClass( 'button-lock' );
 		bind_actions();

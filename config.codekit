@@ -31,9 +31,20 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
+	"\/assets\/script\/common.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/assets\/script\/common.js",
+		"outputAbbreviatedPath": "\/assets\/script\/min\/common-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 1,
+		"syntaxCheckerStyle": 1
+		},
 	"\/assets\/script\/group.js": {
 		"fileType": 64,
-		"ignore": 0,
+		"ignore": 1,
 		"ignoreWasSetByUser": 1,
 		"inputAbbreviatedPath": "\/assets\/script\/group.js",
 		"outputAbbreviatedPath": "\/assets\/script\/min\/group-min.js",
@@ -42,9 +53,20 @@
 		"outputStyle": 0,
 		"syntaxCheckerStyle": 1
 		},
+	"\/assets\/script\/hide.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/assets\/script\/hide.js",
+		"outputAbbreviatedPath": "\/assets\/script\/min\/hide-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 1,
+		"syntaxCheckerStyle": 1
+		},
 	"\/assets\/script\/lock.js": {
 		"fileType": 64,
-		"ignore": 0,
+		"ignore": 1,
 		"ignoreWasSetByUser": 1,
 		"inputAbbreviatedPath": "\/assets\/script\/lock.js",
 		"outputAbbreviatedPath": "\/assets\/script\/min\/lock-min.js",
@@ -53,23 +75,23 @@
 		"outputStyle": 0,
 		"syntaxCheckerStyle": 1
 		},
-	"\/assets\/script\/min\/group-min.js": {
+	"\/assets\/script\/min\/plugin_grouper-min.js": {
 		"fileType": 64,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/assets\/script\/min\/group-min.js",
-		"outputAbbreviatedPath": "\/assets\/script\/min\/min\/group-min-min.js",
+		"inputAbbreviatedPath": "\/assets\/script\/min\/plugin_grouper-min.js",
+		"outputAbbreviatedPath": "\/assets\/script\/min\/min\/plugin_grouper-min-min.js",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
-	"\/assets\/script\/min\/lock-min.js": {
+	"\/assets\/script\/plugin_grouper.js": {
 		"fileType": 64,
-		"ignore": 1,
+		"ignore": 0,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/assets\/script\/min\/lock-min.js",
-		"outputAbbreviatedPath": "\/assets\/script\/min\/min\/lock-min-min.js",
+		"inputAbbreviatedPath": "\/assets\/script\/plugin_grouper.js",
+		"outputAbbreviatedPath": "\/assets\/script\/min\/plugin_grouper-min.js",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 1,
@@ -93,6 +115,15 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
+	"\/classes\/Hide.php": {
+		"fileType": 8192,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/classes\/Hide.php",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
 	"\/classes\/Init.php": {
 		"fileType": 8192,
 		"ignore": 0,
@@ -107,6 +138,15 @@
 		"ignore": 0,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/classes\/Lock.php",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/classes\/ScreenOption.php": {
+		"fileType": 8192,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/classes\/ScreenOption.php",
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
@@ -154,6 +194,32 @@
 	],
 "lastSavedByUser": "Sujin Choi",
 "manualImportLinks": {
+	"\/assets\/script\/plugin_grouper.js": [
+		{
+			"followForSyntaxChecking": 1,
+			"linkedFileAbbreviatedPath": "\/assets\/script\/common.js",
+			"position": 0,
+			"type": 0
+			},
+		{
+			"followForSyntaxChecking": 1,
+			"linkedFileAbbreviatedPath": "\/assets\/script\/group.js",
+			"position": 1,
+			"type": 0
+			},
+		{
+			"followForSyntaxChecking": 1,
+			"linkedFileAbbreviatedPath": "\/assets\/script\/lock.js",
+			"position": 2,
+			"type": 0
+			},
+		{
+			"followForSyntaxChecking": 1,
+			"linkedFileAbbreviatedPath": "\/assets\/script\/hide.js",
+			"position": 3,
+			"type": 0
+			}
+		]
 	},
 "projectAttributes": {
 	"bowerAbbreviatedPath": "",
