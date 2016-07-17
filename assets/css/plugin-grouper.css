@@ -1,0 +1,53 @@
+.subsubsub a.group {
+  display: inline-block;
+  background-color: #EEEEEE;
+  padding: 0px 6px;
+  border-radius: 2px;
+  margin-right: 2px;
+}
+table.plugins tr th.check-column input {
+  display: none;
+}
+table.plugins tr td.plugin-title .row-actions .lock .dashicons-unlock {
+  font-size: 1.3em;
+}
+table.plugins tr td.plugin-title .row-actions .activate {
+  display: none;
+}
+table.plugins tr td.plugin-title .row-actions .deactivate {
+  display: none;
+}
+table.plugins tr td.plugin-title .row-actions .delete {
+  display: none;
+}
+table.plugins tr td.column-description .groups {
+  margin-bottom: 10px;
+}
+table.plugins tr td.column-description .groups a {
+  display: inline-block;
+  background-color: #EEEEEE;
+  padding: 3px 5px;
+  border-radius: 2px;
+  margin-right: 2px;
+}
+table.plugins tr.locked th.check-column {
+  text-align: center;
+}
+table.plugins tr.plugin_grouper_wrap td {
+  padding: 0 0 25px 47px;
+  box-shadow: inset #EEEEEE 0 0 20px !important;
+}
+table.plugins tr.plugin_grouper_wrap td .sp-replacer {
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  margin-left: 5px;
+}
+table.plugins tr.plugin_grouper_wrap td .sp-replacer .sp-preview {
+  width: 15px;
+  height: 15px;
+  border: #FFFFFF;
+}
+table.plugins tr.plugin_grouper_wrap td .sp-replacer .sp-dd {
+  display: none;
+}

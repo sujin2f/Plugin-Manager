@@ -1,0 +1,61 @@
+# Copyright (C) 2016 Plugin Manager
+# This file is distributed under the same license as the Plugin Manager package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Plugin Manager 3.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/plugin-grouper\n"
+"POT-Creation-Date: 2016-05-14 21:51:26+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: classes/Group.php:80
+msgid "Group"
+msgstr ""
+
+#: classes/Group.php:346
+msgid "All"
+msgstr ""
+
+#: classes/Group.php:357
+msgid "Groups"
+msgstr ""
+
+#: classes/Init.php:63
+msgid "Plugin Group"
+msgstr ""
+
+#: classes/Init.php:64
+msgid "Delete Group"
+msgstr ""
+
+#: classes/Lock.php:71
+msgid "Unlock"
+msgstr ""
+
+#: classes/Lock.php:73
+msgid "Lock"
+msgstr ""
+
+#: templates/modal_table.php:2
+msgid "Grouping"
+msgstr ""
+
+#: templates/modal_table.php:32
+msgid "Create Group"
+msgstr ""
+
+#: templates/modal_table.php:33
+msgid "Close"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Plugin Manager"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Too many plugins bother you? Make them into group!"
+msgstr ""
