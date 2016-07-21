@@ -18,6 +18,7 @@ if ( !defined( "ABSPATH" ) ) {
 
 class Init {
 	private $Group, $Lock, $Hide, $AdminPage;
+	public $upgrade = false;
 
 	function __get( $name ) {
 		if ( $name == 'option' )
@@ -25,7 +26,7 @@ class Init {
 	}
 
 	function __construct() {
-		register_activation_hook( PIGPR_PLUGIN_DIR . PIGPR_PLUGIN_FILE_NAME , array( $this, "Upgrade" ) );
+		add_action( 'wp_loaded', array( $this, 'Upgrade' ) );
 
 		if ( !is_admin() )
 			return false;
@@ -42,7 +43,7 @@ class Init {
 	private function ActivateObjects() {
 		$this->Group = new Group( $this );
 /*
-		$this->Lock = new Lock();
+		$this->Lock = new Lock( $this );
 		$this->Hide = new Hide();
 */
 		$this->AdminPage = new AdminPage( $this );
@@ -93,38 +94,82 @@ class Init {
 		return $location;
 	}
 
-	private function Upgrade() {
+	public function Upgrade() {
 		$current_version = get_option( 'PIGPR_VERSION_NUM' );
+		$upgraded = false;
 
 		// From Version 1.0.0
-		if ( version_compare( $current_version, '5.0.0', '<' ) ) {
-			$groups = get_option( 'plugin_groups' );
+		if ( version_compare( $current_version, '2.0.0', '<' ) ) {
+			$this->Upgrade2();
+			$upgraded = true;
+		}
 
-			if ( $groups ) {
-				foreach( $groups as &$group ) {
-					if ( !is_array( $group ) ) {
-						$group = array(
-							'color' => '#666666',
-							'name' => $group
-						);
+		if ( version_compare( $current_version, '5.0.0', '<' ) ) {
+			$this->Upgrade5();
+			$upgraded = true;
+		}
+
+		if ( $upgraded )
+			update_option( 'PIGPR_VERSION_NUM', PIGPR_VERSION_NUM );
+	}
+
+	private function Upgrade2() {
+		$groups = get_option( 'plugin_groups' );
+
+		if ( $groups ) {
+			foreach( $groups as &$group ) {
+				if ( !is_array( $group ) ) {
+					$group = array(
+						'color' => '#666666',
+						'name' => $group
+					);
+				}
+			}
+		}
+
+		update_option( '_plugin-manager_', $groups );
+		delete_option( 'plugin_groups' );
+	}
+
+	private function Upgrade5() {
+		$plugins = get_plugins();
+		$plugin_groups_match = get_option( 'plugin_groups_match' );
+		$groups_plugin_match = get_option( 'groups_plugin_match' );
+		$plugin_groups_match_new = array();
+		$groups_plugin_match_new = array();
+
+		// Delete Empty Array
+		foreach( $plugin_groups_match as $key => $value ) {
+			if ( count( $value ) )
+				$plugin_groups_match_new[ $key ] = $value;
+		}
+
+		update_option( 'plugin_groups_match', $plugin_groups_match_new );
+
+		$plugin_groups_match = $plugin_groups_match_new;
+		$plugin_groups_match_new = array();
+
+		foreach( $plugin_groups_match as $option_plugin_key => $option_plugin_value ) {
+			$matched = false;
+			foreach( $plugins as $plugin_key => $plugin ) {
+				if ( strstr( $plugin_key, $option_plugin_key . '/' ) !== false )
+					$matched = $plugin_key;
+			}
+
+			if ( $matched ) {
+				$plugin_groups_match_new[ $matched ] = $plugin_groups_match[ $option_plugin_key ];
+
+				foreach( $groups_plugin_match as $option_group_key => $option_group_value ) {
+					foreach( $option_group_value as $key => $value ) {
+						if ( $value == $option_plugin_key ) {
+							$groups_plugin_match_new[ $option_group_key ][ $matched ] = $groups_plugin_match[ $option_group_key ][ $option_plugin_key ];
+						}
 					}
 				}
 			}
-
-			update_option( '_plugin-manager_', $groups );
-			delete_option( 'plugin_groups' );
 		}
 
-		// Delete Empty Array
-		$plugin_groups_match = get_option( 'plugin_groups_match' );
-		$plugin_groups_match_ = array();
-
-		foreach( $plugin_groups_match as $key => $value ) {
-			if ( count( $value ) )
-				$plugin_groups_match_[ $key ] = $value;
-		}
-
-		update_option( 'plugin_groups_match', $plugin_groups_match_ );
-		update_option( 'PIGPR_VERSION_NUM', PIGPR_VERSION_NUM );
+		update_option( 'plugin_groups_match', $plugin_groups_match_new );
+		update_option( 'groups_plugin_match', $groups_plugin_match_new );
 	}
 }

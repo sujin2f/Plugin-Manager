@@ -19,7 +19,7 @@ if ( !defined( "ABSPATH" ) ) {
 class Group {
 	const DEFAULT_COLOR = '#666666';
 
-	private $is_group_query, $plugin_groups, $plugin_groups_match, $groups_plugin_match, $num_all_plugins;
+	private $plugin_groups, $plugin_groups_match, $groups_plugin_match, $num_all_plugins;
 	private $PluginManager;
 
 	function __get( $name ) {
@@ -36,13 +36,11 @@ class Group {
 		$this->plugin_groups_match = get_option( 'plugin_groups_match' );
 		$this->groups_plugin_match = get_option( 'groups_plugin_match' );
 
-/* 		$this->is_group_query = !empty( $_GET['plugin_group'] ); */
-
 		# AJAX
 		add_action( 'wp_ajax_PIGPR_CREATE_GROUP', array( $this, 'create_group' ) );
 		add_action( 'wp_ajax_PIGPR_INPUT_INTO_GROUP', array( $this, 'input_into_group' ) );
 		add_action( 'wp_ajax_PIGPR_DELETE_FROM_GROUP', array( $this, 'AjaxDeleteFromGroup' ) );
-		add_action( 'wp_ajax_PIGPR_SET_GROUP_COLOR', array( $this, 'set_group_color' ) );
+		add_action( 'wp_ajax_PIGPR_SET_GROUP_COLOR', array( $this, 'AjaxSetGroupColour' ) );
 
 		// Group Buttons
 		add_filter( 'network_admin_plugin_action_links' , array( $this, 'PrintGroupButton' ), 15, 4 );
@@ -58,32 +56,13 @@ class Group {
 
 		// On Description Column
 		add_filter( "plugin_row_meta", array( $this, 'PrintGroupsOnDescription' ), 15, 3 );
-
-		// Group View Redirection
-// 		add_action( 'init', array( $this, 'GroupViewRedirection' ) );
-
-		if ( $this->is_group_query ) {
-			add_action( 'admin_footer', array( $this, 'PrintGroupInformation' ) );
-			add_action( 'wp_loaded', array( $this, 'ActionDeleteGroup' ) );
-		}
 	}
-
-/*
-	public function GroupViewRedirection() {
-		if ( isset( $_POST[ 'gm-plugin' ] ) && !empty( $_POST[ 'gm-plugin' ] ) ) {
-
-			$arg = implode( 'plugin_grouper_url_needle', $_POST[ 'gm-plugin' ] );
-			wp_redirect( add_query_arg( 'plugin_group', $arg ) );
-			die;
-		}
-	}
-*/
 
 	public function PrintGroupButton( $actions, $plugin_file, $plugin_data, $a ) {
 		$text_class = !empty( $this->option[ 'show-only-icons' ] ) ? 'hidden' : '';
 
-		$actions['group'] = sprintf( '<a href="#" class="button-grouping button-plugin-manager" data-id="%s"><span class="dashicons dashicons-groups"></span><span class="text %s">%s</span></a>',
-			( isset( $plugin_data[ 'slug' ] ) && $plugin_data[ 'slug' ] ) ? $plugin_data[ 'slug' ] : sanitize_title( $plugin_data['Name'] ),
+		$actions['group'] = sprintf( '<a href="#" class="button-grouping button-plugin-manager" data-plugin="%s"><span class="dashicons dashicons-groups"></span><span class="text %s">%s</span></a>',
+			$plugin_file,
 			$text_class,
 			__( 'Group', PIGPR_TEXTDOMAIN )
 		);
@@ -92,16 +71,14 @@ class Group {
 	}
 
 	public function PrintGroupsOnDescription( $plugin_meta, $plugin_file, $plugin_data ) {
-		$slug = ( isset( $plugin_data[ 'slug' ] ) && $plugin_data[ 'slug' ] ) ? $plugin_data[ 'slug' ] : sanitize_title( $plugin_data['Name'] );
-
 		echo '<div class="groups">';
 
-		if ( !empty( $this->plugin_groups_match[$slug] ) ) {
-			foreach( $this->plugin_groups_match[$slug] as $key => $name ) {
+		if ( !empty( $this->plugin_groups_match[$plugin_file] ) ) {
+			foreach( $this->plugin_groups_match[$plugin_file] as $key => $name ) {
 				$background_color = $this->plugin_groups[$key]['color'];
-				$color = $this->get_contrast_color( $background_color );
+				$color = $this->GetContrastColour( $background_color );
 
-				printf( '<a href="%s?plugin_group=%s" style="background-color:%s; color:%s" data-id="%s" data-bgcolor="%s" data-color="%s">%s</a>', $this->get_plugins_url(), $key, $background_color, $color, $key, $background_color, $color, $name );
+				printf( '<a href="%s?plugin_group=%s" style="background-color:%s; color:%s" data-id="%s" data-bgcolor="%s" data-color="%s">%s</a>', $this->GetPluginUri(), $key, $background_color, $color, $key, $background_color, $color, $name );
 			}
 		}
 		echo '</div>';
@@ -109,41 +86,6 @@ class Group {
 		return $plugin_meta;
 	}
 
-	// On Footer
-	public function PrintGroupInformation() {
-		$group_key = $_GET['plugin_group'];
-
-		printf( '<input type="hidden" id="plugin_group_name" value="%s" />', $this->plugin_groups[$group_key]['name'] );
-	}
-
-	public function ActionDeleteGroup() {
-		if ( empty( $_GET['action'] ) || empty( $_GET['group_id'] ) ) return false;
-
-		$action = $_GET['action'];
-		$group_id = strtolower( urlencode( $_GET['group_id'] ) );
-
-		if ( $action != 'delete_group' || empty( $group_id ) ) return false;
-
-		$plugin_groups_match_replace = $this->plugin_groups_match;
-
-		unset( $this->plugin_groups[$group_id] );
-		unset( $this->groups_plugin_match[$group_id] );
-
-		foreach ( $this->plugin_groups_match as $plugin_key => $plugin_groups ) {
-			foreach( $plugin_groups as $group_key => $value ) {
-				if ( $group_key == $group_id ) {
-					unset( $plugin_groups_match_replace[$plugin_key][$group_key] );
-				}
-			}
-		}
-
-		update_option( 'plugin_groups', $this->plugin_groups );
-		update_option( 'plugin_groups_match', $plugin_groups_match_replace );
-		update_option( 'groups_plugin_match', $this->groups_plugin_match );
-
-		wp_redirect( $this->get_plugins_url() );
-		die();
-	}
 
 	public function create_group() {
 		$group_name = $_POST[ 'group_name' ];
@@ -153,7 +95,7 @@ class Group {
 
 		if ( $group_id && empty( $this->plugin_groups[$group_id] ) ) {
 			$bgcolor = apply_filters( 'plugin_group_default_color', $this::DEFAULT_COLOR );
-			$color = $this->get_contrast_color( $bgcolor );
+			$color = $this->GetContrastColour( $bgcolor );
 
 			$this->plugin_groups[$group_id] = array(
 				'color' => $bgcolor,
@@ -163,7 +105,7 @@ class Group {
 			update_option( 'plugin_groups', $this->plugin_groups );
 
 			echo json_encode( array(
-				'url' => $this->get_plugins_url() . '?plugin_group=' . $group_id,
+				'url' => $this->GetPluginUri() . '?plugin_group=' . $group_id,
 				'group_id' => $group_id,
 				'group_name' => $group_name,
 				'bgcolor' => $bgcolor,
@@ -195,10 +137,10 @@ class Group {
 
 		if ( $echo ) {
 			$background_color = $this->plugin_groups[$group_id]['color'];
-			$color = $this->get_contrast_color( $background_color );
+			$color = $this->GetContrastColour( $background_color );
 
 			echo json_encode( array(
-				'url' => $this->get_plugins_url() . '?plugin_group=' . $group_id,
+				'url' => $this->GetPluginUri() . '?plugin_group=' . $group_id,
 				'bgcolor' => $background_color,
 				'color' => $color
 			));
@@ -227,7 +169,7 @@ class Group {
 		wp_die();
 	}
 
-	public function set_group_color() {
+	public function AjaxSetGroupColour() {
 		$group_id = $_POST['group_id'];
 		$color = $_POST['color'];
 
@@ -239,19 +181,14 @@ class Group {
 
 		echo json_encode( array(
 			'bgcolor' => $color,
-			'color' => $this->get_contrast_color( $color )
+			'color' => $this->GetContrastColour( $color )
 		) );
 
 		wp_die();
 	}
 
+
 	public function ModifyAllPlugins( $plugins ) {
-console( $this->plugin_groups_match );
-console( $this->groups_plugin_match );
-console( $this->plugin_groups );
-
-console( $plugins );
-
 		$this->num_all_plugins = count( $plugins );
 
 		if ( !empty( $_GET[ 'plugin_group' ] ) && $_GET[ 'plugin_group' ] == 'not_in_any_groups' ) {
@@ -259,10 +196,7 @@ console( $plugins );
 
 			foreach( $plugins as $key => $plugin ) {
 				foreach( $this->plugin_groups_match as $key_opt => $plugin_opt ) {
-					if ( strstr( $key, $key_opt . '/' ) !== false )
-						unset( $plugins_[ $key ] );
-
-					if ( sanitize_title( $plugin[ 'Name' ] ) == $key_opt )
+					if ( $key == $key_opt )
 						unset( $plugins_[ $key ] );
 				}
 			}
@@ -273,41 +207,12 @@ console( $plugins );
 
 			foreach( $this->groups_plugin_match[ $_GET[ 'plugin_group' ] ] as $group_key => $value ) {
 				foreach( $plugins as $key => $plugin ) {
-					if ( strstr( $key, $group_key . '/' ) !== false )
-						$plugins_[ $key ] = $plugin;
-
-					if ( sanitize_title( $plugin[ 'Name' ] ) == $group_key )
+					if ( $key == $group_key )
 						$plugins_[ $key ] = $plugin;
 				}
 			}
 			return $plugins_;
 		}
-
-
-
-
-/*
-		if ( $this->is_group_query ) {
-			$plugins_ = array();
-			$plugin_info = get_site_transient( 'update_plugins' );
-
-			foreach ( (array) $plugins as $plugin_file => $plugin_data ) {
-				if ( isset( $plugin_info->no_update[ $plugin_file ] ) ) {
-					$plugins[ $plugin_file ] = $plugin_data = array_merge( (array) $plugin_info->no_update[ $plugin_file ], $plugin_data );
-				}
-			}
-
-			foreach( $plugins as $key => $plugin_data ) {
-				$slug = ( $plugin_data[ 'slug' ] ) ? $plugin_data[ 'slug' ] : sanitize_title( $plugin_data['Name'] );
-
-				if ( !empty( $this->groups_plugin_match[$_GET['plugin_group']][$slug] ) ) {
-					$plugins_[$key] = $plugin_data;
-				}
-			}
-
-			return $plugins_;
-		}
-*/
 
 		return $plugins;
 	}
@@ -359,15 +264,8 @@ console( $plugins );
 		return $views;
 	}
 
-	/**
-	 * Get Admin Plugins URL * inc. network site.
-	 *
-	 * @since 1.1.0
-	 * @access private
-	 *
-	 * @return: (string) $url
-	 */
-	private function get_plugins_url() {
+
+	private function GetPluginUri() {
 		$url = get_bloginfo( 'url' ) . '/wp-admin/';
 		$url .= ( is_network_admin() ) ? 'network/' : '';
 		$url .= 'plugins.php';
@@ -375,15 +273,7 @@ console( $plugins );
 		return $url;
 	}
 
-	/**
-	 * Get Brightness
-	 *
-	 * @since 2.0.0
-	 * @access private
-	 *
-	 */
-
-	private function get_contrast_color( $hex ) {
+	private function GetContrastColour( $hex ) {
 		$hex = str_replace( '#', '', $hex );
 
 		if( strlen( $hex ) == 3 ) {
