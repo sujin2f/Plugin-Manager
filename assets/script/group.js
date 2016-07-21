@@ -1,4 +1,11 @@
 jQuery( document ).ready( function( $ ) {
+	// ESC
+	$(document).keyup(function(e) {
+		if (e.keyCode == 27) {
+			CloseGrouping();
+		}
+	});
+
 	// <!-- Binding 개별 항목 액션
 	$( '.button-grouping' ).click( function( e ) {	// 각 플러그인의 그룹 버튼 클릭시
 		e.preventDefault();
