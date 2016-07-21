@@ -18,7 +18,18 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class Lock {
-	function __construct() {
+	private $PluginManager;
+
+	function __get( $name ) {
+		if ( $name == 'option' )
+			return $this->PluginManager->option;
+
+		return $this->{$name};
+	}
+
+	function __construct( $parent ) {
+		$this->PluginManager = $parent;
+
 		add_action( 'wp_ajax_PIGPR_LOCK', array( $this, 'Lock' ) );
 		add_action( 'wp_ajax_PIGPR_UNLOCK', array( $this, 'Unlock' ) );
 
@@ -47,7 +58,7 @@ class Lock {
 	}
 
 	public function AddActionLink( $actions, $plugin_file, $plugin_data, $a ) {
-		$text_class = ( $GLOBALS[ 'PIGPR' ]->ScreenOption->hide_text ) ? 'hidden' : '';
+		$text_class = !empty( $this->option[ 'show-only-icons' ] ) ? 'hidden' : '';
 
 		if ( $this->isLocked( $plugin_file ) ) {
 			$actions['lock'] = sprintf(

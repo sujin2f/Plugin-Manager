@@ -42,8 +42,8 @@ class Init {
 
 	private function ActivateObjects() {
 		$this->Group = new Group( $this );
-/*
 		$this->Lock = new Lock( $this );
+/*
 		$this->Hide = new Hide();
 */
 		$this->AdminPage = new AdminPage( $this );
