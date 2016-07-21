@@ -8,76 +8,71 @@
  * Author URI: http://www.sujinc.com/
  *
 */
-.subsubsub a.group {
-  display: inline-block;
-  background-color: #EEEEEE;
-  padding: 0px 6px;
-  border-radius: 2px;
-  margin-right: 2px;
-}
-table.plugins tr {
-  /*
-		td.plugin-title {
-			.row-actions {
-				.lock .dashicons-unlock {
-					font-size:1.3em;
-				}
-
-				.activate {
-					display:none;
-				}
-
-				.deactivate {
-					display:none;
-				}
-
-				.delete {
-					display:none;
-				}
-			}
-		}
-*/
-}
-table.plugins tr.hidden.show {
-  display: table-row;
-}
-table.plugins tr.hidden.show td {
-  color: gray;
-}
-table.plugins tr.hidden.show td p {
-  color: gray;
-}
-table.plugins tr th.check-column input {
-  display: none;
-}
-table.plugins tr td.column-description .groups {
+table.plugins td.column-description .groups {
   margin-bottom: 10px;
 }
-table.plugins tr td.column-description .groups a {
+table.plugins td.column-description .groups a {
   display: inline-block;
   background-color: #EEEEEE;
   padding: 3px 5px;
   border-radius: 2px;
   margin-right: 2px;
 }
-table.plugins tr.locked th.check-column {
-  text-align: center;
-}
-table.plugins tr.plugin_grouper_wrap td {
+table.plugins .plugin_grouper_wrap td {
   padding: 0 0 25px 47px;
   box-shadow: inset #EEEEEE 0 0 20px !important;
 }
-table.plugins tr.plugin_grouper_wrap td .sp-replacer {
+table.plugins .plugin_grouper_wrap td .sp-replacer {
   padding: 0;
   border: 0;
   background-color: transparent;
   margin-left: 5px;
 }
-table.plugins tr.plugin_grouper_wrap td .sp-replacer .sp-preview {
+table.plugins .plugin_grouper_wrap td .sp-replacer .sp-preview {
   width: 15px;
   height: 15px;
   border: #FFFFFF;
 }
-table.plugins tr.plugin_grouper_wrap td .sp-replacer .sp-dd {
+table.plugins .plugin_grouper_wrap td .sp-replacer .sp-dd {
+  display: none;
+}
+table.plugins tr.inactive th.check-column .dashicons-lock,
+table.plugins tr.active th.check-column .dashicons-lock {
+  display: none;
+}
+table.plugins tr.inactive th.check-column input,
+table.plugins tr.active th.check-column input {
+  display: none;
+}
+table.plugins tr.inactive .row-actions > span,
+table.plugins tr.active .row-actions > span {
+  display: none;
+}
+table.plugins tr.inactive.locked th.check-column,
+table.plugins tr.active.locked th.check-column {
+  text-align: center;
+}
+table.plugins tr.inactive.locked th.check-column .dashicons-lock,
+table.plugins tr.active.locked th.check-column .dashicons-lock {
+  display: inline-block;
+}
+table.plugins tr.inactive.locked th.check-column input,
+table.plugins tr.active.locked th.check-column input {
+  display: none;
+}
+table.plugins tr.inactive.locked .row-actions > span.unlock,
+table.plugins tr.active.locked .row-actions > span.unlock {
+  display: inherit;
+}
+table.plugins tr.inactive.unlocked th.check-column input,
+table.plugins tr.active.unlocked th.check-column input {
+  display: block;
+}
+table.plugins tr.inactive.unlocked .row-actions > span,
+table.plugins tr.active.unlocked .row-actions > span {
+  display: inline-block;
+}
+table.plugins tr.inactive.unlocked .row-actions > span.unlock,
+table.plugins tr.active.unlocked .row-actions > span.unlock {
   display: none;
 }

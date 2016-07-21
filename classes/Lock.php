@@ -53,23 +53,32 @@ class Lock {
 	public function AddActionLink( $actions, $plugin_file, $plugin_data, $a ) {
 		$text_class = !empty( $this->option[ 'hide_text' ] ) ? 'hidden' : '';
 
-		if ( $this->isLocked( $plugin_file ) ) {
-			$actions['lock'] = sprintf(
-				'<a href="#" class="button-unlock button-plugin-manager" data-id="%s" data-plugin_file="%s"><span class="dashicons dashicons-unlock"></span><span class="text %s">%s</span></a>',
-				sanitize_title( $plugin_data['Name'] ),
-				$plugin_file,
-				$text_class,
-				__( 'Unlock', PIGPR_TEXTDOMAIN )
-			);
-		} else {
-			$actions['lock'] = sprintf(
-				'<a href="#" class="button-lock button-plugin-manager" data-id="%s" data-plugin_file="%s"><span class="dashicons dashicons-lock"></span><span class="text %s">%s</span></a>',
-				sanitize_title( $plugin_data['Name'] ),
-				$plugin_file,
-				$text_class,
-				__( 'Lock', PIGPR_TEXTDOMAIN )
-			);
-		}
+		$actions['unlock'] = sprintf(
+			'<a href="#" class="button-unlock button-plugin-manager" data-id="%s" data-plugin_file="%s">
+				<span class="dashicons dashicons-unlock"></span>
+				<span class="text %s">%s</span>
+			</a>',
+
+			sanitize_title( $plugin_data['Name'] ),
+			$plugin_file,
+			$text_class,
+			__( 'Unlock', PIGPR_TEXTDOMAIN )
+		);
+
+		$class = $this->isLocked( $plugin_file ) ? 'locked' : '';
+
+		$actions['lock'] = sprintf(
+			'<a href="#" class="button-lock button-plugin-manager" data-locked="%s" data-id="%s" data-plugin_file="%s">
+				<span class="dashicons dashicons-lock"></span>
+				<span class="text %s">%s</span>
+			</a>',
+
+			$class,
+			sanitize_title( $plugin_data['Name'] ),
+			$plugin_file,
+			$text_class,
+			__( 'Lock', PIGPR_TEXTDOMAIN )
+		);
 
 		return $actions;
 	}

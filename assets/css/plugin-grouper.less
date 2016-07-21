@@ -9,99 +9,104 @@
  *
 */
 
-.subsubsub a.group {
-	display:inline-block;
-	background-color:#EEEEEE;
-	padding:0px 6px;
-	border-radius:2px;
-	margin-right:2px;
-}
-
-table.plugins {
-	tr {
-		// 숨김 플러그인 보기
-		&.hidden.show {
-			display: table-row;
-
-			td {
-				color: gray;
-
-				p {
-					color: gray;
-				}
-			}
-		}
-
+.lock-template() {
+  tr.inactive, tr.active {
+	  // 일단 대쉬콘, 체크박스, 버튼을 다 없애고
 		th.check-column {
+			.dashicons-lock {
+				display:none;
+			}
+
 			input {
 				display:none;
 			}
 		}
 
-/*
-		td.plugin-title {
-			.row-actions {
-				.lock .dashicons-unlock {
-					font-size:1.3em;
-				}
-
-				.activate {
-					display:none;
-				}
-
-				.deactivate {
-					display:none;
-				}
-
-				.delete {
-					display:none;
-				}
-			}
-		}
-*/
-
-		td.column-description {
-			.groups {
-				margin-bottom:10px;
-
-				a {
-					display:inline-block;
-					background-color:#EEEEEE;
-					padding:3px 5px;
-					border-radius:2px;
-					margin-right:2px;
-				}
-			}
+		.row-actions > span {
+			display:none;
 		}
 
+		// 잠김 상태일 때
 		&.locked {
 			th.check-column {
 				text-align: center;
+
+				.dashicons-lock {
+					display: inline-block;
+				}
+
+				input {
+					display:none;
+				}
+			}
+
+			.row-actions > span {
+				&.unlock {
+					display:inherit;
+				}
 			}
 		}
 
-		&.plugin_grouper_wrap {
-			td {
-				padding: 0 0 25px 47px;
-				box-shadow:inset #EEEEEE 0 0 20px !important;
+		// 안잠김 상태일 때
+		&.unlocked {
+			th.check-column {
+				input {
+					display:block;
+				}
+			}
 
-				.sp-replacer {
-					padding:0;
-					border: 0;
-					background-color:transparent;
-					margin-left:5px;
+			.row-actions > span {
+				display: inline-block;
 
-					.sp-preview {
-						width: 15px;
-						height: 15px;
-						border: #FFFFFF;
-					}
+				&.unlock {
+					display:none;
+				}
+			}
+		}
+  }
+}
 
-					.sp-dd {
-						display: none;
-					}
+table.plugins {
+	// Description의 그룹 이름
+	td.column-description {
+		.groups {
+			margin-bottom:10px;
+
+			a {
+				display:inline-block;
+				background-color:#EEEEEE;
+				padding:3px 5px;
+				border-radius:2px;
+				margin-right:2px;
+			}
+		}
+	}
+
+	// 그룹 창
+	.plugin_grouper_wrap {
+		td {
+			padding: 0 0 25px 47px;
+			box-shadow:inset #EEEEEE 0 0 20px !important;
+
+			.sp-replacer {
+				padding:0;
+				border: 0;
+				background-color:transparent;
+				margin-left:5px;
+
+				.sp-preview {
+					width: 15px;
+					height: 15px;
+					border: #FFFFFF;
+				}
+
+				.sp-dd {
+					display: none;
 				}
 			}
 		}
 	}
+
+	// Lock
+	.lock-template();
 }
