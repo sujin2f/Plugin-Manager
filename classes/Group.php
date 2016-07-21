@@ -19,18 +19,10 @@ if ( !defined( "ABSPATH" ) ) {
 class Group {
 	const DEFAULT_COLOR = '#666666';
 
-	private $plugin_groups, $plugin_groups_match, $groups_plugin_match, $num_all_plugins;
-	private $PluginManager;
+	private $option, $plugin_groups, $plugin_groups_match, $groups_plugin_match, $num_all_plugins;
 
-	function __get( $name ) {
-		if ( $name == 'option' )
-			return $this->PluginManager->option;
-
-		return $this->{$name};
-	}
-
-	function __construct( $parent ) {
-		$this->PluginManager = $parent;
+	function __construct() {
+		$this->option = get_option( '_plugin-manager_', array() );
 
 		$this->plugin_groups = get_option( 'plugin_groups' );
 		$this->plugin_groups_match = get_option( 'plugin_groups_match' );
@@ -59,7 +51,7 @@ class Group {
 	}
 
 	public function PrintGroupButton( $actions, $plugin_file, $plugin_data, $a ) {
-		$text_class = !empty( $this->option[ 'show-only-icons' ] ) ? 'hidden' : '';
+		$text_class = !empty( $this->option[ 'hide_text' ] ) ? 'hidden' : '';
 
 		$actions['group'] = sprintf( '<a href="#" class="button-grouping button-plugin-manager" data-plugin="%s"><span class="dashicons dashicons-groups"></span><span class="text %s">%s</span></a>',
 			$plugin_file,

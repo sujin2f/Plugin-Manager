@@ -20,17 +20,10 @@ if ( !defined( "ABSPATH" ) ) {
 
 class Hide {
 	private $subsubsub_info = array();
-	private $PluginManager;
+	private $option;
 
-	function __get( $name ) {
-		if ( $name == 'option' )
-			return $this->PluginManager->option;
-
-		return $this->{$name};
-	}
-
-	function __construct( $parent ) {
-		$this->PluginManager = $parent;
+	function __construct() {
+		$this->option = get_option( '_plugin-manager_', array() );
 
 		// Ajax
 		add_action( 'wp_ajax_PIGPR_HIDE', array( $this, 'AjaxHide' ) );
@@ -276,7 +269,7 @@ class Hide {
 	}
 
 	public function AddActionLink( $actions, $plugin_file, $plugin_data, $a ) {
-		$text_class = !empty( $this->option[ 'show-only-icons' ] ) ? 'hidden' : '';
+		$text_class = !empty( $this->option[ 'hide_text' ] ) ? 'hidden' : '';
 
 		if ( $this->isHidden( $plugin_file ) )
 			$actions['hide'] = sprintf(

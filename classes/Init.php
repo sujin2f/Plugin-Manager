@@ -17,13 +17,8 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class Init {
-	private $Group, $Lock, $Hide, $AdminPage;
+	private $Group, $Lock, $Hide, $ScreenOption;
 	public $upgrade = false;
-
-	function __get( $name ) {
-		if ( $name == 'option' )
-			return get_option( '_plugin-manager_' );
-	}
 
 	function __construct() {
 		add_action( 'wp_loaded', array( $this, 'Upgrade' ) );
@@ -41,11 +36,10 @@ class Init {
 	}
 
 	private function ActivateObjects() {
-		$this->Group = new Group( $this );
-		$this->Lock = new Lock( $this );
-		$this->Hide = new Hide( $this );
-
-		$this->AdminPage = new AdminPage( $this );
+		$this->Group = new Group();
+		$this->Lock = new Lock();
+		$this->Hide = new Hide();
+		$this->ScreenOption = new ScreenOption();
 	}
 
 	public function ActivatePlugin() {
