@@ -60,9 +60,13 @@ table.plugins tr.inactive.locked th.check-column input,
 table.plugins tr.active.locked th.check-column input {
   display: none;
 }
-table.plugins tr.inactive.locked .row-actions > span.unlock,
-table.plugins tr.active.locked .row-actions > span.unlock {
-  display: inherit;
+table.plugins tr.inactive.locked .row-actions > span.lock,
+table.plugins tr.active.locked .row-actions > span.lock {
+  display: inline-block;
+}
+table.plugins tr.inactive.locked .row-actions > span.lock .button-lock,
+table.plugins tr.active.locked .row-actions > span.lock .button-lock {
+  display: none;
 }
 table.plugins tr.inactive.unlocked th.check-column input,
 table.plugins tr.active.unlocked th.check-column input {
@@ -72,7 +76,21 @@ table.plugins tr.inactive.unlocked .row-actions > span,
 table.plugins tr.active.unlocked .row-actions > span {
   display: inline-block;
 }
-table.plugins tr.inactive.unlocked .row-actions > span.unlock,
-table.plugins tr.active.unlocked .row-actions > span.unlock {
+table.plugins tr.inactive.unlocked .row-actions > span.lock .button-unlock,
+table.plugins tr.active.unlocked .row-actions > span.lock .button-unlock {
   display: none;
+}
+table.plugins tr.inactive.show .row-actions > span.hide .button-show,
+table.plugins tr.active.show .row-actions > span.hide .button-show {
+  display: none;
+}
+table.plugins tr.inactive.hide .row-actions > span.hide .button-hide,
+table.plugins tr.active.hide .row-actions > span.hide .button-hide {
+  display: none;
+}
+table.plugins tr.hide {
+  display: none;
+}
+table.plugins.mode-show-hidden tr.hide {
+  display: table-row;
 }

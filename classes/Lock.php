@@ -53,25 +53,23 @@ class Lock {
 	public function AddActionLink( $actions, $plugin_file, $plugin_data, $a ) {
 		$text_class = !empty( $this->option[ 'hide_text' ] ) ? 'hidden' : '';
 
-		$actions['unlock'] = sprintf(
+		$class = $this->isLocked( $plugin_file ) ? 'locked' : '';
+
+		$actions['lock'] = sprintf(
 			'<a href="#" class="button-unlock button-plugin-manager" data-id="%s" data-plugin_file="%s">
 				<span class="dashicons dashicons-unlock"></span>
+				<span class="text %s">%s</span>
+			</a>
+
+			<a href="#" class="button-lock button-plugin-manager" data-locked="%s" data-id="%s" data-plugin_file="%s">
+				<span class="dashicons dashicons-lock"></span>
 				<span class="text %s">%s</span>
 			</a>',
 
 			sanitize_title( $plugin_data['Name'] ),
 			$plugin_file,
 			$text_class,
-			__( 'Unlock', PIGPR_TEXTDOMAIN )
-		);
-
-		$class = $this->isLocked( $plugin_file ) ? 'locked' : '';
-
-		$actions['lock'] = sprintf(
-			'<a href="#" class="button-lock button-plugin-manager" data-locked="%s" data-id="%s" data-plugin_file="%s">
-				<span class="dashicons dashicons-lock"></span>
-				<span class="text %s">%s</span>
-			</a>',
+			__( 'Unlock', PIGPR_TEXTDOMAIN ),
 
 			$class,
 			sanitize_title( $plugin_data['Name'] ),

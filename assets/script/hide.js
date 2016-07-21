@@ -1,43 +1,69 @@
 jQuery( document ).ready( function( $ ) {
+	// 초기화 ( 각 tr에 class 부여 )
+	$( 'table.plugins tbody tr .row-actions .hide a.button-hide' ).each( function() {
+		if ( $(this).attr( 'data-hidden' ) == 'hidden' ) {
+			Hide( $(this) );
+		} else {
+			Show( $(this) );
+		}
+	});
+
+	if ( getUrlParameter( 'plugin_status' ) == 'hidden' ) {
+		$( 'table.plugins' ).addClass( 'mode-show-hidden' );
+	}
+
+	// Bind Actions;
+	$( '.button-hide' ).click( function( e ) {
+		e.preventDefault();
+		var plugin_file = $(this).attr( "data-plugin_file" );
+
+		var data = {
+			'action' : 'PIGPR_HIDE',
+			'mode' : 'Plugin Manager',
+			'plugin_file' : plugin_file
+		};
+
+		$obj = $(this);
+
+		$.post( ajaxurl, data, function( response ) {
+			Hide( $obj );
+		}, 'json' );
+	});
+
+	$( '.button-show' ).click( function( e ) {
+		e.preventDefault();
+		var plugin_file = $(this).attr( "data-plugin_file" );
+
+		var data = {
+			'action' : 'PIGPR_SHOW',
+			'mode' : 'Plugin Manager',
+			'plugin_file' : plugin_file
+		};
+
+		$obj = $(this);
+
+		$.post( ajaxurl, data, function( response ) {
+			Show( $obj );
+		}, 'json' );
+	});
+
+	function Show( $obj ) {
+		$obj.parents( 'tr' ).addClass( 'show' );
+		$obj.parents( 'tr' ).removeClass( 'hide' );
+	}
+
+	function Hide( $obj ) {
+		$obj.parents( 'tr' ).removeClass( 'show' );
+		$obj.parents( 'tr' ).addClass( 'hide' );
+	}
+
+
 /*
 	// <!-- Binding 개별 항목 액션
 	function bind_actions() {
 		$( '.button-hide' ).unbind();
 		$( '.button-show' ).unbind();
 
-		$( '.button-hide' ).click( function( e ) {
-			e.preventDefault();
-			var plugin_file = $(this).attr( "data-plugin_file" );
-
-			var data = {
-				'action' : 'PIGPR_HIDE',
-				'mode' : 'Plugin Manager',
-				'plugin_file' : plugin_file
-			};
-
-			$obj = $(this);
-
-			$.post( ajaxurl, data, function( response ) {
-				hide( $obj );
-			}, 'json' );
-		});
-
-		$( '.button-show' ).click( function( e ) {
-			e.preventDefault();
-			var plugin_file = $(this).attr( "data-plugin_file" );
-
-			var data = {
-				'action' : 'PIGPR_SHOW',
-				'mode' : 'Plugin Manager',
-				'plugin_file' : plugin_file
-			};
-
-			$obj = $(this);
-
-			$.post( ajaxurl, data, function( response ) {
-				show( $obj );
-			}, 'json' );
-		});
 	}
 	bind_actions();
 	// Binding 개별 항목 액션 -->

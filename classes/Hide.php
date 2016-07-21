@@ -271,22 +271,29 @@ class Hide {
 	public function AddActionLink( $actions, $plugin_file, $plugin_data, $a ) {
 		$text_class = !empty( $this->option[ 'hide_text' ] ) ? 'hidden' : '';
 
-		if ( $this->isHidden( $plugin_file ) )
-			$actions['hide'] = sprintf(
-				'<a href="#" class="button-show button-plugin-manager" data-id="%s" data-plugin_file="%s"><span class="dashicons dashicons-visibility"></span><span class="text %s">%s</span></a>',
-				sanitize_title( $plugin_data['Name'] ),
-				$plugin_file,
-				$text_class,
-				__( 'Show', PIGPR_TEXTDOMAIN )
-			);
-		else
-			$actions['hide'] = sprintf(
-				'<a href="#" class="button-hide button-plugin-manager" data-id="%s" data-plugin_file="%s"><span class="dashicons dashicons-hidden"></span><span class="text  %s">%s</span></a>',
-				sanitize_title( $plugin_data['Name'] ),
-				$plugin_file,
-				$text_class,
-				__( 'Hide', PIGPR_TEXTDOMAIN )
-			);
+		$class = $this->isHidden( $plugin_file ) ? 'hidden' : '';
+		$actions['hide'] = sprintf(
+			'<a href="#" class="button-show button-plugin-manager" data-id="%s" data-plugin_file="%s">
+				<span class="dashicons dashicons-visibility"></span>
+				<span class="text %s">%s</span>
+			</a>
+
+			<a href="#" class="button-hide button-plugin-manager" data-hidden="%s" data-id="%s" data-plugin_file="%s">
+				<span class="dashicons dashicons-hidden"></span>
+				<span class="text  %s">%s</span>
+			</a>',
+
+			sanitize_title( $plugin_data['Name'] ),
+			$plugin_file,
+			$text_class,
+			__( 'Show', PIGPR_TEXTDOMAIN ),
+
+			$class,
+			sanitize_title( $plugin_data['Name'] ),
+			$plugin_file,
+			$text_class,
+			__( 'Hide', PIGPR_TEXTDOMAIN )
+		);
 
 		return $actions;
 	}

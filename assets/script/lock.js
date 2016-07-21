@@ -1,6 +1,6 @@
 jQuery( document ).ready( function( $ ) {
 	// 초기화 ( 각 tr에 class 부여 )
-	$( 'table.plugins tbody tr .row-actions .lock a' ).each( function() {
+	$( 'table.plugins tbody tr .row-actions .lock a.button-lock' ).each( function() {
 		if ( $(this).attr( 'data-locked' ) == 'locked' ) {
 			Lock( $(this) );
 		} else {
@@ -54,6 +54,4 @@ jQuery( document ).ready( function( $ ) {
 		$obj.parents( 'tr' ).removeClass( 'locked' );
 		$obj.parents( 'tr' ).addClass( 'unlocked' );
 	}
-
-//
 });

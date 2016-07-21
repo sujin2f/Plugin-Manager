@@ -40,10 +40,12 @@
 				}
 			}
 
-			.row-actions > span {
-				&.unlock {
-					display:inherit;
-				}
+			.row-actions > span.lock {
+				display:inline-block;
+			}
+
+			.row-actions > span.lock .button-lock {
+				display:none;
 			}
 		}
 
@@ -58,12 +60,30 @@
 			.row-actions > span {
 				display: inline-block;
 
-				&.unlock {
+				&.lock .button-unlock {
 					display:none;
 				}
 			}
 		}
   }
+}
+
+.hide-template() {
+  tr.inactive, tr.active {
+		// 안숨김 상태일 때
+		&.show {
+			.row-actions > span.hide .button-show {
+				display:none;
+			}
+		}
+
+		// 안숨김 상태일 때
+		&.hide {
+			.row-actions > span.hide .button-hide {
+				display:none;
+			}
+		}
+	}
 }
 
 table.plugins {
@@ -107,6 +127,16 @@ table.plugins {
 		}
 	}
 
-	// Lock
+	// Lock / Hide
 	.lock-template();
+	.hide-template();
+
+	tr.hide {
+		display: none;
+	}
+
+	&.mode-show-hidden tr.hide {
+		display: table-row;
+	}
 }
+
