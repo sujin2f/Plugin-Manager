@@ -20,8 +20,17 @@ if ( !defined( "ABSPATH" ) ) {
 
 class Hide {
 	private $show_hidden = false;
+	private $PluginManager;
 
-	function __construct() {
+	function __get( $name ) {
+		if ( $name == 'option' )
+			return $this->PluginManager->option;
+
+		return $this->{$name};
+	}
+
+	function __construct( $parent ) {
+		$this->PluginManager = $parent;
 		// Ajax
 		add_action( 'wp_ajax_PIGPR_HIDE', array( $this, 'AjaxHide' ) );
 		add_action( 'wp_ajax_PIGPR_SHOW', array( $this, 'AjaxShow' ) );
@@ -97,7 +106,7 @@ class Hide {
 	}
 
 	public function AddActionLink( $actions, $plugin_file, $plugin_data, $a ) {
-		$text_class = ( $GLOBALS[ 'PIGPR' ]->ScreenOption->hide_text ) ? 'hidden' : '';
+		$text_class = !empty( $this->option[ 'show-only-icons' ] ) ? 'hidden' : '';
 
 		if ( $this->isHidden( $plugin_file ) )
 			$actions['hide'] = sprintf(
