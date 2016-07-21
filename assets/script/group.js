@@ -44,13 +44,6 @@ jQuery( document ).ready( function( $ ) {
 	});
 	// Binding 개별 항목 액션 -->
 
-
-
-
-
-
-
-
 	// <!-- 가져오기 시리즈 ( 체크박스 )
 	function GetCheckbox( checkbox_id ) {
 		if ( checkbox_id ) {
@@ -193,7 +186,7 @@ jQuery( document ).ready( function( $ ) {
 
 					// Subsubsub
 					$( '.subsubsub.plugin-groups li:last-child a' ).after( ' |' );
-					$( '.subsubsub.plugin-groups li:last-child a' ).parent().after( '<li class="group"><a href="' + url + '" >' + group_name + '</a></li>' );
+					$( '.subsubsub.plugin-groups li:last-child a' ).parent().after( '<li class="group"><a href="' + url + '" >' + group_name + '</a> <span class="count">(1)</span></li>' );
 
 					RunCheckbox();
 					BindColorPicker();

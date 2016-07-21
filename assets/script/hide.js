@@ -1,4 +1,5 @@
 jQuery( document ).ready( function( $ ) {
+/*
 	// <!-- Binding 개별 항목 액션
 	function bind_actions() {
 		$( '.button-hide' ).unbind();
@@ -92,4 +93,5 @@ jQuery( document ).ready( function( $ ) {
 			hide( $(this) );
 		}
 	});
+*/
 });
