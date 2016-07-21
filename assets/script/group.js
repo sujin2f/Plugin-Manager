@@ -53,6 +53,17 @@ jQuery( document ).ready( function( $ ) {
 
 		return $( '.plugin_grouper_wrap input[type="checkbox"]' );
 	}
+	// 체크된 체크박스 수
+	function NumCheckedCheckbox() {
+		var number = 0;
+
+		GetCheckbox().each( function() {
+			if ( $(this).prop('checked') )
+				number++;
+		});
+
+		return number;
+	}
 
 	// <!-- 가져오기 시리즈 ( 플러그인 테이블 로우 )
 	function GetRow( plugin_id ) {
@@ -89,6 +100,15 @@ jQuery( document ).ready( function( $ ) {
 					var html = '<a href="' + response.url + '" data-id="' + group_id + '" style="background-color:' + response.bgcolor + '; color:' + response.color + '" data-id="' + group_id + '" data-bgcolor="' + response.bgcolor + '" data-color="' + response.color + '">'+group_name+'</a>';
 					GetRow( plugin_id ).find( 'td.column-description .groups' ).append( html );
 					EnableGrouping();
+
+					// 숫자 변경
+					var number = $( '.subsubsub.plugin-groups li.' + group_id + ' .count' ).html();
+					number = parseInt( number.substr( 1, number.length - 2 ) ) + 1;
+
+					$( '.subsubsub.plugin-groups li.' + group_id + ' .count' ).html( '(' + number + ')' );
+
+					ChangeNonNumber( 'trace adding' );
+
 				}, 'json' );
 
 			// 그룹에서 제외
@@ -99,9 +119,35 @@ jQuery( document ).ready( function( $ ) {
 					GetRow( plugin_id ).find( 'td.column-description .groups a[data-id="'+ group_id +'"]' ).remove();
 
 					EnableGrouping();
+
+					// 숫자 변경
+					var number = $( '.subsubsub.plugin-groups li.' + group_id + ' .count' ).html();
+					number = parseInt( number.substr( 1, number.length - 2 ) ) - 1;
+
+					$( '.subsubsub.plugin-groups li.' + group_id + ' .count' ).html( '(' + number + ')' );
+
+					ChangeNonNumber( 'trace subtraction' );
 				}, 'json' );
 			}
 		});
+	}
+
+	function ChangeNonNumber( mode ) {
+		var num_checkboxes = NumCheckedCheckbox();
+
+		// 지정된 체크박스가 하나라면? (없다가 하나 생김) || 체크박스가 없다면? (있다가 없어짐)
+		if ( num_checkboxes == 1 || num_checkboxes == 0 ) {
+			var number = $( '.subsubsub.plugin-groups li.not-in-any-groups .count' ).html();
+			number = parseInt( number.substr( 1, number.length - 2 ) );
+
+			if ( num_checkboxes == 1 && mode == 'trace adding' )
+				number--;
+
+			if ( num_checkboxes == 0 && mode == 'trace subtraction'  )
+				number++;
+
+			$( '.subsubsub.plugin-groups li.not-in-any-groups .count' ).html( '(' + number + ')' );
+		}
 	}
 	// 체크박스를 클릭했을 때 -->
 
@@ -186,13 +232,15 @@ jQuery( document ).ready( function( $ ) {
 
 					// Subsubsub
 					$( '.subsubsub.plugin-groups li:last-child a' ).after( ' |' );
-					$( '.subsubsub.plugin-groups li:last-child a' ).parent().after( '<li class="group"><a href="' + url + '" >' + group_name + '</a> <span class="count">(1)</span></li>' );
+					$( '.subsubsub.plugin-groups li:last-child a' ).parent().after( '<li class="group ' + group_name + '"><a href="' + url + '" >' + group_name + '</a> <span class="count">(0)</span></li>' );
 
 					RunCheckbox();
 					BindColorPicker();
 
 					$( '.wp-list-table.plugins .inp-create_group' ).val('');
 					$( '#group_radio_' + index ).click();
+
+					ChangeNonNumber( 'trace adding' );
 				}, 'json' );
 			} else {
 				$( '.wp-list-table.plugins .inp-create_group' ).focus();

@@ -235,13 +235,13 @@ class Group {
 		$class = ( !$_GET[ 'plugin_group' ] ) ? 'current' : '';
 		$groups[ 'all in any groups' ] = sprintf( '<li class="group"><a href="plugins.php" class="%s">All <span class="count">(%s)</span></a>', $class, $this->num_all_plugins );
 		$class = ( $_GET[ 'plugin_group' ] == 'not_in_any_groups' ) ? 'current' : '';
-		$groups[ 'not in any groups' ] = sprintf( '<li class="group"><a href="plugins.php?plugin_group=not_in_any_groups" class="%s">None <span class="count">(%s)</span></a>', $class, $num_not_in_groups );
+		$groups[ 'not in any groups' ] = sprintf( '<li class="group not-in-any-groups"><a href="plugins.php?plugin_group=not_in_any_groups" class="%s">None <span class="count">(%s)</span></a>', $class, $num_not_in_groups );
 
 		foreach( $this->plugin_groups as $key => $value ) {
 			$background_color = $value['color'];
 
 			$class = ( $_GET[ 'plugin_group' ] == $key ) ? 'current' : '';
-			$groups[ $key ] = sprintf( '<li class="group"><a href="plugins.php?plugin_group=%s" class="%s"><span class="colour" style="background-color:%s"></span>%s <span class="count">(%s)</span></a>', $key, $class, $background_color, $value['name'], count( $this->groups_plugin_match[ $key ] ) );
+			$groups[ $key ] = sprintf( '<li class="group %s"><a href="plugins.php?plugin_group=%s" class="%s"><span class="colour" style="background-color:%s"></span>%s <span class="count">(%s)</span></a>', $key, $key, $class, $background_color, $value['name'], count( $this->groups_plugin_match[ $key ] ) );
 		}
 
 		?>
