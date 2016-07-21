@@ -53,4 +53,4 @@ if ( !defined( "PIGPR_VERSION_NUM" ) )
 
 # 가는거야~!
 include_once( PIGPR_PLUGIN_DIR . "/autoload.php");
-$GLOBALS[ 'PIGPR' ] = new PIGPR\Init();
+new PIGPR\Init();

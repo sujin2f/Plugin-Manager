@@ -20,8 +20,18 @@ class Group {
 	const DEFAULT_COLOR = '#666666';
 
 	private $is_group_query, $plugin_groups, $plugin_groups_match, $groups_plugin_match, $num_all_plugins;
+	private $PluginManager;
 
-	function __construct() {
+	function __get( $name ) {
+		if ( $name == 'option' )
+			return $this->PluginManager->option;
+
+		return $this->{$name};
+	}
+
+	function __construct( $parent ) {
+		$this->PluginManager = $parent;
+
 		$this->plugin_groups = get_option( 'plugin_groups' );
 		$this->plugin_groups_match = get_option( 'plugin_groups_match' );
 		$this->groups_plugin_match = get_option( 'groups_plugin_match' );
@@ -70,7 +80,7 @@ class Group {
 */
 
 	public function PrintGroupButton( $actions, $plugin_file, $plugin_data, $a ) {
-		$text_class = ( $GLOBALS[ 'PIGPR' ]->ScreenOption->hide_text ) ? 'hidden' : '';
+		$text_class = !empty( $this->option[ 'show-only-icons' ] ) ? 'hidden' : '';
 
 		$actions['group'] = sprintf( '<a href="#" class="button-grouping button-plugin-manager" data-id="%s"><span class="dashicons dashicons-groups"></span><span class="text %s">%s</span></a>',
 			( isset( $plugin_data[ 'slug' ] ) && $plugin_data[ 'slug' ] ) ? $plugin_data[ 'slug' ] : sanitize_title( $plugin_data['Name'] ),
@@ -236,6 +246,12 @@ class Group {
 	}
 
 	public function ModifyAllPlugins( $plugins ) {
+console( $this->plugin_groups_match );
+console( $this->groups_plugin_match );
+console( $this->plugin_groups );
+
+console( $plugins );
+
 		$this->num_all_plugins = count( $plugins );
 
 		if ( !empty( $_GET[ 'plugin_group' ] ) && $_GET[ 'plugin_group' ] == 'not_in_any_groups' ) {
@@ -266,6 +282,10 @@ class Group {
 			}
 			return $plugins_;
 		}
+
+
+
+
 /*
 		if ( $this->is_group_query ) {
 			$plugins_ = array();
@@ -323,7 +343,7 @@ class Group {
 		foreach( $this->plugin_groups as $key => $value ) {
 			$background_color = $value['color'];
 
-		$class = ( $_GET[ 'plugin_group' ] == $key ) ? 'current' : '';
+			$class = ( $_GET[ 'plugin_group' ] == $key ) ? 'current' : '';
 			$groups[ $key ] = sprintf( '<li class="group"><a href="plugins.php?plugin_group=%s" class="%s"><span class="colour" style="background-color:%s"></span>%s <span class="count">(%s)</span></a>', $key, $class, $background_color, $value['name'], count( $this->groups_plugin_match[ $key ] ) );
 		}
 
@@ -335,26 +355,6 @@ class Group {
 
 		<div class='clear'></div>
 		<?php
-
-
-
-/*
-			unset($views);
-			$views['all'] = sprintf( '<a href="plugins.php?plugin_status=all">%s</a>', __( 'All', PIGPR_TEXTDOMAIN ) );
-
-			foreach( $groups as $key => $value ) {
-				$background_color = $value['color'];
-				$color = $this->get_contrast_color( $background_color );
-				$class = ( strtolower( urlencode( $_GET['plugin_group'] ) ) == strtolower( $key ) ) ? 'current' : '';
-
-				$views[$key] = sprintf( '<a href="plugins.php?plugin_group=%s" class="%s group" data-color="%s" style="background-color:%s; color:%s">%s</a>', $key, $class, $value['color'], $background_color, $color, $value['name'] );
-			}
-*/
-/*
-		} else {
-
-		}
-*/
 
 		return $views;
 	}
@@ -399,32 +399,5 @@ class Group {
 		$contrast = ( $r + $g + $b ) / 3;
 
 		return ( $contrast < 128 ) ? "#FFFFFF" : "#000000";
-	}
-
-	public function AddOptionTextMode( $screen_settings ) {
-		$plugin_group_var = ( isset( $_GET[ 'plugin_group' ] ) ) ? explode( 'plugin_grouper_url_needle', $_GET[ 'plugin_group' ] ) : false;
-
-		ob_start();
-		?>
-		<fieldset class="screen-options">
-			<legend>
-				<?php _e( 'Group', PIGPR_TEXTDOMAIN ) ?>
-				<?php if ( $plugin_group_var ) : ?>
-				&nbsp;&nbsp;&nbsp;
-				<label><button name="gm-show_all" id="group-manager-group-show_all" value="gm-text"> Show All</button>
-				<?php endif; ?>
-			</legend>
-
-			<?php foreach( $this->plugin_groups as $key => $group ) : ?>
-			<label>
-				<input name="gm-plugin[<?php echo $key ?>]" type="checkbox" id="group-manager-plugin-<?php echo $key ?>" value="<?php echo $key ?>" <?php echo in_array( $key, $plugin_group_var ) ? 'checked="checked"' : '' ?>>
-					<?php echo $group[ 'name' ] . ' (' . count( $this->groups_plugin_match[ $key ] ) . ')' ?>
-			</label>&nbsp;&nbsp;&nbsp;
-			<?php endforeach; ?>
-		</fieldset>
-		<?php
-		$screen_settings .= ob_get_clean();
-
-		return $screen_settings;
 	}
 }

@@ -18,7 +18,11 @@ if ( !defined( "ABSPATH" ) ) {
 
 class Init {
 	private $Group, $Lock, $Hide, $AdminPage;
-	public $ScreenOption;
+
+	function __get( $name ) {
+		if ( $name == 'option' )
+			return get_option( '_plugin-manager_' );
+	}
 
 	function __construct() {
 		register_activation_hook( PIGPR_PLUGIN_DIR . PIGPR_PLUGIN_FILE_NAME , array( $this, "Upgrade" ) );
@@ -36,12 +40,12 @@ class Init {
 	}
 
 	private function ActivateObjects() {
-		$this->Group = new Group();
+		$this->Group = new Group( $this );
 /*
 		$this->Lock = new Lock();
 		$this->Hide = new Hide();
 */
-		$this->ScreenOption = new ScreenOption();
+		$this->AdminPage = new AdminPage( $this );
 	}
 
 	public function ActivatePlugin() {
@@ -93,7 +97,7 @@ class Init {
 		$current_version = get_option( 'PIGPR_VERSION_NUM' );
 
 		// From Version 1.0.0
-		if ( version_compare( $current_version, '2.0.0', '<' ) ) {
+		if ( version_compare( $current_version, '5.0.0', '<' ) ) {
 			$groups = get_option( 'plugin_groups' );
 
 			if ( $groups ) {
@@ -107,7 +111,8 @@ class Init {
 				}
 			}
 
-			update_option( 'plugin_groups', $groups );
+			update_option( '_plugin-manager_', $groups );
+			delete_option( 'plugin_groups' );
 		}
 
 		// Delete Empty Array
@@ -120,11 +125,6 @@ class Init {
 		}
 
 		update_option( 'plugin_groups_match', $plugin_groups_match_ );
-
 		update_option( 'PIGPR_VERSION_NUM', PIGPR_VERSION_NUM );
-
-
 	}
 }
-
-
