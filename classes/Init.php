@@ -120,7 +120,7 @@ class Init {
 			}
 		}
 
-		update_option( '_plugin-manager_', $groups );
+		update_option( 'plugin_groups', $groups );
 		delete_option( 'plugin_groups' );
 	}
 
