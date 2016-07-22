@@ -151,6 +151,7 @@ class Init {
 			}
 		}
 
+
 		update_option( 'plugin_groups_match', $plugin_groups_match_new );
 
 		$plugin_groups_match = $plugin_groups_match_new;
@@ -160,6 +161,14 @@ class Init {
 			$matched = false;
 			foreach( $plugins as $plugin_key => $plugin ) {
 				if ( strstr( $plugin_key, $option_plugin_key . '/' ) !== false ) {
+					$matched = $plugin_key;
+				}
+
+				if ( $plugin[ 'slug' ] == $option_plugin_key ) {
+					$matched = $plugin_key;
+				}
+
+				if ( sanitize_title( $plugin[ 'Name' ] ) == $option_plugin_key ) {
 					$matched = $plugin_key;
 				}
 			}
