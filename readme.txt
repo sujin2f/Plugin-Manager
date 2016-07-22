@@ -13,6 +13,7 @@ Too many plugins bother you? Put them into a group!
 == Description ==
 
 If your plugin admin page had so many items, you would be struggle to manage them. Make them categorized with this plugin :D
+* Update Warning : If you update from 4.0.0 to 5.0.0, some grouping configuration could be disappeared. Sorry about it.
 
 == Installation ==
 

@@ -126,6 +126,19 @@ class Init {
 
 	private function Upgrade5() {
 		$plugins = get_plugins();
+
+		$plugin_info = get_site_transient( 'update_plugins' );
+
+		foreach ( (array) $plugins as $plugin_file => $plugin_data ) {
+			// Extra info if known. array_merge() ensures $plugin_data has precedence if keys collide.
+			if ( isset( $plugin_info->response[ $plugin_file ] ) ) {
+				$plugins[ $plugin_file ] = $plugin_data = array_merge( (array) $plugin_info->response[ $plugin_file ], $plugin_data );
+
+			} elseif ( isset( $plugin_info->no_update[ $plugin_file ] ) ) {
+				$plugins[ $plugin_file ] = $plugin_data = array_merge( (array) $plugin_info->no_update[ $plugin_file ], $plugin_data );
+			}
+		}
+
 		$plugin_groups_match = get_option( 'plugin_groups_match' );
 		$groups_plugin_match = get_option( 'groups_plugin_match' );
 		$plugin_groups_match_new = array();
@@ -133,8 +146,9 @@ class Init {
 
 		// Delete Empty Array
 		foreach( $plugin_groups_match as $key => $value ) {
-			if ( count( $value ) )
-				$plugin_groups_match_new[ $key ] = $value;
+			if ( count( $value ) ) {
+				$plugin_groups_match_new[ $key ] = $plugin_groups_match[ $key ];
+			}
 		}
 
 		update_option( 'plugin_groups_match', $plugin_groups_match_new );
@@ -145,8 +159,9 @@ class Init {
 		foreach( $plugin_groups_match as $option_plugin_key => $option_plugin_value ) {
 			$matched = false;
 			foreach( $plugins as $plugin_key => $plugin ) {
-				if ( strstr( $plugin_key, $option_plugin_key . '/' ) !== false )
+				if ( strstr( $plugin_key, $option_plugin_key . '/' ) !== false ) {
 					$matched = $plugin_key;
+				}
 			}
 
 			if ( $matched ) {
