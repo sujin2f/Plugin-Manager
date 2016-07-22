@@ -21,7 +21,7 @@ class Init {
 	public $upgrade = false;
 
 	function __construct() {
-		add_action( 'wp_loaded', array( $this, 'Upgrade' ) );
+		add_action( 'admin_init', array( $this, 'Upgrade' ) );
 
 		if ( !is_admin() )
 			return false;
@@ -80,8 +80,9 @@ class Init {
 	}
 
 	public function WP_Redirect( $location ) {
-		if ( isset( $_REQUEST['plugin_group'] ) && isset( $_REQUEST['action'] ) && $_REQUEST['action'] !== 'delete_group' ) {
-			$location = add_query_arg( 'plugin_group', $_REQUEST['plugin_group'], $location );
+		if ( headers_sent() ) {
+			printf( '<meta http-equiv="refresh" content="0; url=%s">', $location );
+			die;
 		}
 
 		return $location;
@@ -90,6 +91,7 @@ class Init {
 	public function Upgrade() {
 		$current_version = get_option( 'PIGPR_VERSION_NUM' );
 		$upgraded = false;
+		$redirect = false;
 
 		// From Version 1.0.0
 		if ( version_compare( $current_version, '2.0.0', '<' ) ) {
@@ -100,10 +102,14 @@ class Init {
 		if ( version_compare( $current_version, '5.0.0', '<' ) ) {
 			$this->Upgrade5();
 			$upgraded = true;
+			$redirect = true;
 		}
 
 		if ( $upgraded )
 			update_option( 'PIGPR_VERSION_NUM', PIGPR_VERSION_NUM );
+
+		if ( $redirect )
+			wp_redirect( remove_query_arg( 'foo', 'bar' ) );
 	}
 
 	private function Upgrade2() {
@@ -125,7 +131,7 @@ class Init {
 	}
 
 	private function Upgrade5() {
-		$plugins = get_plugins();
+		$plugins = \get_plugins();
 
 		$plugin_info = get_site_transient( 'update_plugins' );
 
