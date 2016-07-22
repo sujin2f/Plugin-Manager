@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: Plugin Manager
- * Plugin URI: http://www.sujinc.com/
- * Description: Too many plugins bother you? Make them into group!
- * Version: 4.0.0
- * Author: Sujin 수진 Choi
- * Author URI: https://www.facebook.com/WP-developer-Sujin-1182629808428000/
- * License: GPLv2 or later
- * Text Domain: plugin-grouper
+ * Plugin Name:		Plugin Manager
+ * Plugin URI:		http://www.sujinc.com/
+ * Description:		Too many plugins bothers you? Put them into group!
+ * Version:				5.0.0
+ * Author:				Sujin 수진 Choi
+ * Author URI:		http://www.sujinc.com/
+ * License:				GPLv2 or later
+ * Text Domain:		plugin-grouper
  */
 
 if ( !defined( "ABSPATH" ) ) {
@@ -49,9 +49,8 @@ if ( !defined( "PIGPR_VERSION_KEY" ) )
 	define( "PIGPR_VERSION_KEY", "PIGPR_version" );
 
 if ( !defined( "PIGPR_VERSION_NUM" ) )
-	define( "PIGPR_VERSION_NUM", "3.0.0" );
+	define( "PIGPR_VERSION_NUM", "5.0.0" );
 
 # 가는거야~!
 include_once( PIGPR_PLUGIN_DIR . "/autoload.php");
-// include_once( PIGPR_PLUGIN_DIR . "/classes/wp_express/autoload.php");
-$GLOBALS[ 'PIGPR' ] = new PIGPR\Init();
+new PIGPR\Init();

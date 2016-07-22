@@ -3,8 +3,8 @@ Contributors: sujin2f
 Donate link: http://www.sujinc.com/donation
 Tags: plugin, group, category. manage, admin
 Requires at least: 4.2.2
-Tested up to: 4.5.2
-Stable tag: 4.0.0
+Tested up to: 4.5.3
+Stable tag: 5.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,6 +13,7 @@ Too many plugins bother you? Put them into a group!
 == Description ==
 
 If your plugin admin page had so many items, you would be struggle to manage them. Make them categorized with this plugin :D
+* Update Warning : If you update from 4.0.0 to 5.0.0, some grouping configuration could be disappeared. Sorry about it.
 
 == Installation ==
 
@@ -21,9 +22,17 @@ If your plugin admin page had so many items, you would be struggle to manage the
 1. Set/ Unset Group
 2. Grouping Tag on your List
 3. Group List
-4. Group View
+4. Hide Plugin
+5. Hide Link Texts
+6. Delete Group
 
 == Changelog ==
+= 5.0.0 =
+* Update UI
+* Hide Plugin
+* Delete Group
+* Fix Some Error
+
 = 4.0.0 =
 * Supports Multisite
 

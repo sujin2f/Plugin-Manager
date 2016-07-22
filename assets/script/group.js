@@ -1,75 +1,10 @@
 jQuery( document ).ready( function( $ ) {
-	// <!-- 그룹 보기 모드일 경우 타이틀 바꾸기
-	if ( $( 'input#plugin_group_name' ).length ) {
-		change_header( $( 'input#plugin_group_name' ).val() );
-		change_links( getUrlParameter( 'plugin_group' ) );
-	}
-
-	function change_header( plugin_group_name ) {
-		var plugin_group_id = getUrlParameter( 'plugin_group' );
-
-		var html = objectL10n.plugin_group + ' : ' + plugin_group_name;
-		html += ' <a href="#" class="add-new-h2 btn-delete_group page-title-action">' + objectL10n.delete_group + '</a>';
-
-		$( '#wpbody .wrap' ).children().first().html( html );
-
-		$( '.btn-delete_group' ).click( function(e) {
-			e.preventDefault();
-			window.location.href = window.location.href + "&action=delete_group&group_id=" + plugin_group_id;
-		});
-	}
-	function change_links( plugin_group ) {
-		$( '.wp-list-table.plugins tbody tr' ).each( function() {
-			var _activate = $(this).find( 'td.plugin-title .activate a' ).attr( 'href' ) + '&plugin_group=' + plugin_group;
-			var _deactivate = $(this).find( 'td.plugin-title .deactivate a' ).attr( 'href' ) + '&plugin_group=' + plugin_group;
-			var _delete = $(this).find( 'td.plugin-title .delete a' ).attr( 'href' ) + '&plugin_group=' + plugin_group;
-
-			$(this).find( 'td.plugin-title .activate a' ).attr( 'href', _activate );
-			$(this).find( 'td.plugin-title .deactivate a' ).attr( 'href', _deactivate );
-			$(this).find( 'td.plugin-title .delete a' ).attr( 'href', _delete );
-		});
-	}
-	// 그룹 보기 모드일 경우 타이틀 바꾸기 -->
-
-	function getUrlParameter(sParam) {
-		var sPageURL = window.location.search.substring(1);
-		var sURLVariables = sPageURL.split('&');
-		for (var i = 0; i < sURLVariables.length; i++)  {
-			var sParameterName = sURLVariables[i].split('=');
-			if (sParameterName[0] === sParam)  {
-				return sParameterName[1];
-			}
+	// ESC
+	$(document).keyup(function(e) {
+		if (e.keyCode == 27) {
+			CloseGrouping();
 		}
-	}
-	function escape_special_character( text ) {
-		text = text.replace( /([ #;?%&,.+*~\':"!^$[\]()=>|\/@])/g,'\\$1' );
-		return text;
-	}
-
-	// <!-- 가져오기 시리즈 ( 체크박스 )
-	function get_checkbox( checkbox_id ) {
-		if ( checkbox_id ) {
-			return $( '.plugin_grouper_wrap input[type="checkbox"][data-id="' + escape_special_character( checkbox_id ) +'"]' );
-		}
-
-		return $( '.plugin_grouper_wrap input[type="checkbox"]' );
-	}
-
-	// <!-- 가져오기 시리즈 ( 플러그인 테이블 로우 )
-	function get_row( plugin_id ) {
-		if ( plugin_id ) {
-			var row = $( '.wp-list-table.plugins tr#' + escape_special_character( plugin_id ) );
-
-			if ( row.length == 0 )
-				row = $( '.wp-list-table.plugins tr[data-slug="' + escape_special_character( plugin_id ) + '"]' );
-
-			return row;
-		}
-
-		// 없음 입력창
-		return $( '.plugin_grouper_wrap' );
-	}
-	// 가져오기 시리즈 -->
+	});
 
 	// <!-- Binding 개별 항목 액션
 	$( '.button-grouping' ).click( function( e ) {	// 각 플러그인의 그룹 버튼 클릭시
@@ -77,19 +12,20 @@ jQuery( document ).ready( function( $ ) {
 
 		// 만일 열려있다면? 닫고 끝
 		if ( $(this).hasClass( 'group_open' ) ) {
-			close_grouping();
+			CloseGrouping();
 			return true;
 		}
+
 		// 일단 전부 닫고,
-		close_grouping();
+		CloseGrouping();
 
 		// 현재 플러그인의 아이디 추출
-		var plugin_id = $(this).attr( 'data-id' );
+		var plugin_id = $(this).attr( 'data-plugin' );
 		// 폼 클론 뜨고, id와 for 부여
 		var $groupingRow = $( '#Grouping-Row' ).clone();
 
 		// tr 삽입
-		get_row( plugin_id ).first().after( '<tr class="inactive plugin_grouper_wrap" data-id="' + plugin_id + '"><td colspan="1000">' + $groupingRow.html() + '</td></tr>' );
+		GetRow( plugin_id ).first().after( '<tr class="inactive plugin_grouper_wrap" data-plugin="' + plugin_id + '"><td colspan="1000">' + $groupingRow.html() + '</td></tr>' );
 
 		// radio 버튼 조정
 		$( '.plugin_grouper_wrap li' ).each( function( number ) {
@@ -105,30 +41,63 @@ jQuery( document ).ready( function( $ ) {
 		$(this).addClass( 'group_open' );
 
 		// 바인딩
-		bind_color_picker();
-		bind_button_close();
-		bind_button_create();
-		checkbox_action();
-		checkbox_checking( plugin_id );
+		BindColorPicker();
+		BindButtonClose();
+		BindButtonCreate();
+		RunCheckbox();
+		PreCheckCheckbox( plugin_id );
 
 		return true;
 	});
 	// Binding 개별 항목 액션 -->
 
+	// <!-- 가져오기 시리즈 ( 체크박스 )
+	function GetCheckbox( checkbox_id ) {
+		if ( checkbox_id ) {
+			checkbox_id = checkbox_id.replace( /([ #;?%&,.+*~\':"!^$[\]()=>|\/@])/g,'\\$1' );
+			return $( '.plugin_grouper_wrap input[type="checkbox"][data-id="' + checkbox_id +'"]' );
+		}
+
+		return $( '.plugin_grouper_wrap input[type="checkbox"]' );
+	}
+	// 체크된 체크박스 수
+	function NumCheckedCheckbox() {
+		var number = 0;
+
+		GetCheckbox().each( function() {
+			if ( $(this).prop('checked') )
+				number++;
+		});
+
+		return number;
+	}
+
+	// <!-- 가져오기 시리즈 ( 플러그인 테이블 로우 )
+	function GetRow( plugin_id ) {
+		if ( plugin_id ) {
+			return $( '.wp-list-table.plugins tr[data-plugin="' + plugin_id + '"]' );
+		}
+
+		// 없음 입력창
+		return $( '.plugin_grouper_wrap' );
+	}
+	// 가져오기 시리즈 -->
+
 	// <!-- 체크박스를 클릭했을 때
-	function checkbox_action() {
-		get_checkbox().click( function() {
+	function RunCheckbox() {
+		GetCheckbox().click( function() {
 			var plugin_id = $(this).attr( 'data-plugin-id' );
 			var group_id = $(this).attr( 'data-id' );
 			var group_name = $(this).attr( 'data-name' );
 
 			var data = {
+				'mode' : 'Plugin Manager',
 				'plugin_id' : plugin_id,
 				'group_id' : group_id,
 				'group_name' : group_name
 			};
 
-			disable_grouping();
+			DisableGrouping();
 
 			// 그룹에 추가
 			if ( $(this).is( ":checked" ) ) {
@@ -136,8 +105,17 @@ jQuery( document ).ready( function( $ ) {
 
 				$.post( ajaxurl, data, function( response ) {
 					var html = '<a href="' + response.url + '" data-id="' + group_id + '" style="background-color:' + response.bgcolor + '; color:' + response.color + '" data-id="' + group_id + '" data-bgcolor="' + response.bgcolor + '" data-color="' + response.color + '">'+group_name+'</a>';
-					get_row( plugin_id ).find( 'td.column-description .groups' ).append( html );
-					enable_grouping();
+					GetRow( plugin_id ).find( 'td.column-description .groups' ).append( html );
+					EnableGrouping();
+
+					// 숫자 변경
+					var number = $( '.subsubsub.plugin-groups li.' + group_id + ' .count' ).html();
+					number = parseInt( number.substr( 1, number.length - 2 ) ) + 1;
+
+					$( '.subsubsub.plugin-groups li.' + group_id + ' .count' ).html( '(' + number + ')' );
+
+					ChangeNonNumber( 'trace adding' );
+
 				}, 'json' );
 
 			// 그룹에서 제외
@@ -145,42 +123,66 @@ jQuery( document ).ready( function( $ ) {
 				data.action = 'PIGPR_DELETE_FROM_GROUP';
 
 				$.post( ajaxurl, data, function( response ) {
-					get_row( plugin_id ).find( 'td.column-description .groups a[data-id="'+ group_id +'"]' ).remove();
+					GetRow( plugin_id ).find( 'td.column-description .groups a[data-id="'+ group_id +'"]' ).remove();
 
-					enable_grouping();
+					EnableGrouping();
+
+					// 숫자 변경
+					var number = $( '.subsubsub.plugin-groups li.' + group_id + ' .count' ).html();
+					number = parseInt( number.substr( 1, number.length - 2 ) ) - 1;
+
+					$( '.subsubsub.plugin-groups li.' + group_id + ' .count' ).html( '(' + number + ')' );
+
+					ChangeNonNumber( 'trace subtraction' );
 				}, 'json' );
 			}
 		});
 	}
+	function ChangeNonNumber( mode ) {
+		var num_checkboxes = NumCheckedCheckbox();
+
+		// 지정된 체크박스가 하나라면? (없다가 하나 생김) || 체크박스가 없다면? (있다가 없어짐)
+		if ( num_checkboxes == 1 || num_checkboxes == 0 ) {
+			var number = $( '.subsubsub.plugin-groups li.not-in-any-groups .count' ).html();
+			number = parseInt( number.substr( 1, number.length - 2 ) );
+
+			if ( num_checkboxes == 1 && mode == 'trace adding' )
+				number--;
+
+			if ( num_checkboxes == 0 && mode == 'trace subtraction'  )
+				number++;
+
+			$( '.subsubsub.plugin-groups li.not-in-any-groups .count' ).html( '(' + number + ')' );
+		}
+	}
 	// 체크박스를 클릭했을 때 -->
 
-	// <!-- 입력창 닫기
-	function close_grouping() {
-		get_row().remove();
+	// 입력창 닫기
+	function CloseGrouping() {
+		GetRow().remove();
 		$( '.group_open' ).removeClass( 'group_open' );
 	}
-	// 입력창 닫기 -->
 
 	// <-- 셀렉트 폼 일시정지 & 재가동
-	function disable_grouping() {
+	function DisableGrouping() {
 		$( '.wp-list-table.plugins .loading_spinner' ).show();
-		get_checkbox().attr( 'disabled', true );
+		GetCheckbox().attr( 'disabled', true );
 	}
-	function enable_grouping() {
+	function EnableGrouping() {
 		$( '.wp-list-table.plugins .loading_spinner' ).hide();
-		get_checkbox().removeAttr( 'disabled' );
+		GetCheckbox().removeAttr( 'disabled' );
 	}
 	// 셀렉트 폼 일시정지 & 재가동 -->
 
 	// <!-- 그룹 윈도우 내부 버튼들 (생성, 닫기)
-	function bind_button_close() {
+	function BindButtonClose() {
 		$( '.wp-list-table.plugins .btn-close_group' ).click( function(e) {
 			e.preventDefault();
-			close_grouping();
+			CloseGrouping();
 			return true;
 		});
 	}
-	function bind_button_create() {
+	function BindButtonCreate() {
 		$( '.wp-list-table.plugins .inp-create_group' ).keypress( function(e) {
 			if ( e.which === 10 || e.which === 13 ) {
 				$( '.wp-list-table.plugins .btn-create_group' ).click();
@@ -192,17 +194,18 @@ jQuery( document ).ready( function( $ ) {
 			e.preventDefault();
 
 			if ( $( '.wp-list-table.plugins .inp-create_group' ).val().length ) {
-				var plugin_id = $( '.plugin_grouper_wrap' ).attr( 'data-id' );
+				var plugin_id = $( '.plugin_grouper_wrap' ).attr( 'data-plugin' );
 				var data = {
 					'action': 'PIGPR_CREATE_GROUP',
+					'mode' : 'Plugin Manager',
 					'group_name' : $( '.wp-list-table.plugins .inp-create_group' ).val(),
 					'plugin_id' : plugin_id
 				};
 
-				disable_grouping();
+				DisableGrouping();
 
 				$.post( ajaxurl, data, function( response ) {
-					enable_grouping();
+					EnableGrouping();
 
 					var url = response.url;
 					var group_id = response.group_id;
@@ -233,18 +236,17 @@ jQuery( document ).ready( function( $ ) {
 
 					$gr_li.html( html );
 
-					$( '.subsubsub li:last-child a.group' ).after( ' |' );
-					$( '.subsubsub li:last-child a.group' ).parent().after( '<li class="group"><a href="' + url + '" data-bgcolor="' + bgcolor + '" data-color="' + color + '" data-id="' + group_id + '" class="group">' + group_name + '</a></li>' );
-					$( '.subsubsub li:last-child a.group' ).css({
-						'background-color' : $( '.subsubsub li:last-child a.group' ).attr( 'data-bgcolor' ),
-						'color' : $( '.subsubsub li:last-child a.group' ).attr( 'data-color' )
-					});
+					// Subsubsub
+					$( '.subsubsub.plugin-groups li:last-child a' ).after( ' |' );
+					$( '.subsubsub.plugin-groups li:last-child a' ).parent().after( '<li class="group ' + group_name + '"><a href="' + url + '" >' + group_name + '</a> <span class="count">(0)</span></li>' );
 
-					checkbox_action();
-					bind_color_picker();
+					RunCheckbox();
+					BindColorPicker();
 
 					$( '.wp-list-table.plugins .inp-create_group' ).val('');
 					$( '#group_radio_' + index ).click();
+
+					ChangeNonNumber( 'trace adding' );
 				}, 'json' );
 			} else {
 				$( '.wp-list-table.plugins .inp-create_group' ).focus();
@@ -252,7 +254,8 @@ jQuery( document ).ready( function( $ ) {
 			return true;
 		});
 	}
-	function bind_color_picker() {
+
+	function BindColorPicker() {
 		$( '.wp-list-table.plugins tr.plugin_grouper_wrap .group_colour_picker' ).each( function() {
 			var group_id = $(this).attr( 'data-id' );
 
@@ -273,7 +276,8 @@ jQuery( document ).ready( function( $ ) {
 					var data = {
 						'action' : 'PIGPR_SET_GROUP_COLOR',
 						'group_id' : group_id,
-						'color' : color.toHexString()
+						'color' : color.toHexString(),
+						'mode' : 'Plugin Manager'
 					};
 
 					$.post( ajaxurl, data, function( response ) {
@@ -289,13 +293,14 @@ jQuery( document ).ready( function( $ ) {
 	// 그룹 윈도우 내부 버튼들 (생성, 닫기) -->
 
 	// <!-- 플러그인 선택했을 때 체크박스 체크하기
-	function checkbox_checking( plugin_id ) {
-		get_checkbox().removeAttr( 'checked' );
+	function PreCheckCheckbox( plugin_id ) {
+		GetCheckbox().removeAttr( 'checked' );
 
-		get_row( plugin_id ).find( 'td.column-description .groups a' ).each( function() {
+		GetRow( plugin_id ).find( 'td.column-description .groups a' ).each( function() {
 			var id = $(this).attr( 'data-id' );
-			get_checkbox( id ).attr( 'checked', true );
+			GetCheckbox( id ).attr( 'checked', true );
 		});
 	}
 	// 플러그인 선택했을 때 체크박스 체크하기 -->
 });
+
