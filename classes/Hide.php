@@ -189,7 +189,7 @@ class Hide {
 			$this->subsubsub_info = $plugins;
 
 			// Modify Query
-			$hidden_plugins = get_option( 'plugin_hidden' );
+			$hidden_plugins = get_option( 'plugin_hidden', array() );
 
 			$plugins_ = array();
 			$plugin_info = get_site_transient( 'update_plugins' );
