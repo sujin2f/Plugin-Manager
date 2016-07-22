@@ -82,11 +82,15 @@ class Init {
 
 	public function WP_Redirect( $location ) {
 		if ( headers_sent() ) {
-			printf( '<meta http-equiv="refresh" content="0; url=%s">', $location );
-			die;
+			$this->RedirectMeta( $location );
 		}
 
 		return $location;
+	}
+
+	private function RedirectMeta( $location ) {
+		printf( '<meta http-equiv="refresh" content="0; url=%s">', $location );
+		die;
 	}
 
 	public function Upgrade() {
@@ -110,7 +114,7 @@ class Init {
 			update_option( 'PIGPR_VERSION_NUM', PIGPR_VERSION_NUM );
 
 		if ( $redirect )
-			wp_redirect( remove_query_arg( 'foo', 'bar' ) );
+			$this->RedirectMeta( remove_query_arg( 'foo', 'bar' ) );
 	}
 
 	private function Upgrade2() {
@@ -132,7 +136,7 @@ class Init {
 	}
 
 	private function Upgrade5() {
-		$plugins = \get_plugins();
+		$plugins = get_plugins();
 
 		$plugin_info = get_site_transient( 'update_plugins' );
 
@@ -157,7 +161,6 @@ class Init {
 				$plugin_groups_match_new[ $key ] = $plugin_groups_match[ $key ];
 			}
 		}
-
 
 		update_option( 'plugin_groups_match', $plugin_groups_match_new );
 
