@@ -40,11 +40,18 @@ class ScreenOption {
 	public function AddOptionTextMode( $screen_settings ) {
 		$this->hide_text = ( is_array( $this->option ) && !empty( $this->option[ 'hide_text' ] ) ) ? true : false;
 
+		$plugin_groups = get_option( 'plugin_groups' );
+
 		ob_start();
 		?>
 		<fieldset class="screen-options">
 			<legend><?php _e( 'Option', PIGPR_TEXTDOMAIN ) ?></legend>
 			<label><input name="gm-text" type="checkbox" id="group-manager-setting-text" value="gm-text" <?php echo $this->hide_text ? 'checked="checked"' : '' ?>> Hide Group Manager Text</label>&nbsp;&nbsp;&nbsp;
+
+			<legend><?php _e( 'Click to Delete Group', PIGPR_TEXTDOMAIN ) ?></legend>
+			<?php foreach( $plugin_groups as $key => $value ) { ?>
+			<a href="<?php echo add_query_arg( array( 'mode' => 'delete_group', 'group' => $key ) ) ?>" class="btn-delete_group button">Delete <?php echo $value[ 'name' ] ?></a>
+			<?php } ?>
 		</fieldset>
 		<?php
 		$screen_settings .= ob_get_clean();

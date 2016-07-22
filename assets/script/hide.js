@@ -27,6 +27,11 @@ jQuery( document ).ready( function( $ ) {
 
 		$.post( ajaxurl, data, function( response ) {
 			Hide( $obj );
+
+			var number = $( '.subsubsub li.view_hidden .count' ).html();
+			number = parseInt( number.substr( 1, number.length - 2 ) ) + 1;
+			$( '.subsubsub li.view_hidden .count' ).html( '(' + number + ')' );
+
 		}, 'json' );
 	});
 
@@ -44,6 +49,12 @@ jQuery( document ).ready( function( $ ) {
 
 		$.post( ajaxurl, data, function( response ) {
 			Show( $obj );
+
+			var number = $( '.subsubsub li.view_hidden .count' ).html();
+			number = parseInt( number.substr( 1, number.length - 2 ) ) - 1;
+			$( '.subsubsub li.view_hidden .count' ).html( '(' + number + ')' );
+
+			$obj.parents( 'tr' ).hide();
 		}, 'json' );
 	});
 

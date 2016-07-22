@@ -48,6 +48,11 @@ class Group {
 
 		// On Description Column
 		add_filter( "plugin_row_meta", array( $this, 'PrintGroupsOnDescription' ), 15, 3 );
+
+		// Delete Group
+		if ( !empty( $_GET[ 'mode' ] ) && !empty( $_GET[ 'group' ] ) && $_GET[ 'mode' ] == 'delete_group' ) {
+			add_action( 'init', array( $this, 'DeleteGroup' ) );
+		}
 	}
 
 	public function PrintGroupButton( $actions, $plugin_file, $plugin_data, $a ) {
@@ -78,7 +83,6 @@ class Group {
 		return $plugin_meta;
 	}
 
-
 	public function create_group() {
 		$group_name = $_POST[ 'group_name' ];
 		$plugin_id = $_POST[ 'plugin_id' ];
@@ -108,6 +112,29 @@ class Group {
 		}
 
 		wp_die();
+	}
+
+	public function DeleteGroup() {
+		unset( $this->plugin_groups[ $_GET[ 'group' ] ] );
+		unset( $this->groups_plugin_match[ $_GET[ 'group' ] ] );
+
+		$plugin_groups_match = $this->plugin_groups_match;
+		foreach( $this->plugin_groups_match as $plugin_key => $plugin_value ) {
+			foreach( $plugin_value as $group_key => $group_value ) {
+				if ( $group_key == $_GET[ 'group' ] ) {
+					unset( $plugin_groups_match[ $plugin_key ][ $group_key ] );
+				}
+			}
+
+			if ( !count( $plugin_groups_match[ $plugin_key ] ) )
+				unset( $plugin_groups_match[ $plugin_key ] );
+		}
+
+		update_option( 'plugin_groups', $this->plugin_groups );
+		update_option( 'plugin_groups_match', $plugin_groups_match );
+		update_option( 'groups_plugin_match', $this->groups_plugin_match );
+
+		wp_redirect( remove_query_arg( array( 'mode', 'group' ) ) );
 	}
 
 	public function input_into_group( $group_id = false, $group_name = false, $plugin_id = false, $echo = true ) {

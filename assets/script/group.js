@@ -138,7 +138,6 @@ jQuery( document ).ready( function( $ ) {
 			}
 		});
 	}
-
 	function ChangeNonNumber( mode ) {
 		var num_checkboxes = NumCheckedCheckbox();
 

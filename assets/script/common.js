@@ -17,22 +17,9 @@ jQuery( document ).ready( function( $ ) {
 		}, 'json' );
 	});
 
-	// 숨김 플러그인 보기
-	$( '#group-manager-setting-hidden' ).click( function( e ) {
-		var data = {
-			'action' : 'PIGPR Setting Hidden',
-			'mode' : 'Plugin Manager',
-			'status' : $( '#group-manager-setting-hidden:checked' ).length
-		};
-
-		$obj = $(this);
-
-		$.post( ajaxurl, data, function( response ) {
-			if ( response )
-				$( '.wp-list-table > tbody > tr.hidden' ).addClass( 'show' );
-			else
-				$( '.wp-list-table > tbody > tr.hidden' ).removeClass( 'show' );
-		}, 'json' );
+	$( '.btn-delete_group' ).click( function(e) {
+		if ( !confirm( 'Do you really want to delete this?' ) )
+			e.preventDefault();
 	});
 });
 
