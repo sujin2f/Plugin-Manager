@@ -22,6 +22,7 @@ class Init {
 
 	function __construct() {
 		add_action( 'admin_init', array( $this, 'Upgrade' ) );
+		add_filter( 'wp_redirect', array( $this, 'WP_Redirect' ) );
 
 		if ( !is_admin() )
 			return false;
