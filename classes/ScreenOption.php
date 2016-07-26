@@ -18,7 +18,7 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class ScreenOption {
-	public $option = [];
+	public $option = array();
 	public $hide_text, $show_hidden;
 
 	function __construct() {

@@ -3,7 +3,7 @@
  * Plugin Name:		Plugin Manager
  * Plugin URI:		http://www.sujinc.com/
  * Description:		Too many plugins bothers you? Put them into group!
- * Version:				5.0.0
+ * Version:				5.0.1
  * Author:				Sujin 수진 Choi
  * Author URI:		http://www.sujinc.com/
  * License:				GPLv2 or later
