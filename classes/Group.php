@@ -259,9 +259,9 @@ class Group {
 		$num_not_in_groups = $this->num_all_plugins - count( $this->plugin_groups_match );
 		$groups = array();
 
-		$class = ( !$_GET[ 'plugin_group' ] ) ? 'current' : '';
+		$class = ( empty( $_GET[ 'plugin_group' ] ) ) ? 'current' : '';
 		$groups[ 'all in any groups' ] = sprintf( '<li class="group"><a href="plugins.php" class="%s">All <span class="count">(%s)</span></a>', $class, $this->num_all_plugins );
-		$class = ( $_GET[ 'plugin_group' ] == 'not_in_any_groups' ) ? 'current' : '';
+		$class = ( !empty( $_GET[ 'plugin_group' ] ) && $_GET[ 'plugin_group' ] == 'not_in_any_groups' ) ? 'current' : '';
 		$groups[ 'not in any groups' ] = sprintf( '<li class="group not-in-any-groups"><a href="plugins.php?plugin_group=not_in_any_groups" class="%s">None <span class="count">(%s)</span></a>', $class, $num_not_in_groups );
 
 		foreach( $this->plugin_groups as $key => $value ) {

@@ -31,6 +31,17 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
+	"\/assets\/images\/plugin_danation_link.png": {
+		"fileType": 32768,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 5797,
+		"inputAbbreviatedPath": "\/assets\/images\/plugin_danation_link.png",
+		"outputAbbreviatedPath": "\/assets\/images\/plugin_danation_link.png",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
 	"\/assets\/script\/common.js": {
 		"fileType": 64,
 		"ignore": 0,

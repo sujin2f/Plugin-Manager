@@ -181,11 +181,6 @@ class Hide {
 				}
 			}
 
-			if ( strlen( $s ) ) {
-				$status = 'search';
-				$plugins['search'] = array_filter( $plugins['all'], array( $this, '_search_callback' ) );
-			}
-
 			$this->subsubsub_info = $plugins;
 
 			// Modify Query

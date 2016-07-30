@@ -62,7 +62,7 @@ table.plugins tr.active.locked th.check-column input {
 }
 table.plugins tr.inactive.locked .row-actions > span.lock,
 table.plugins tr.active.locked .row-actions > span.lock {
-  display: inline-block;
+  display: inline;
 }
 table.plugins tr.inactive.locked .row-actions > span.lock .button-lock,
 table.plugins tr.active.locked .row-actions > span.lock .button-lock {
@@ -74,7 +74,7 @@ table.plugins tr.active.unlocked th.check-column input {
 }
 table.plugins tr.inactive.unlocked .row-actions > span,
 table.plugins tr.active.unlocked .row-actions > span {
-  display: inline-block;
+  display: inline;
 }
 table.plugins tr.inactive.unlocked .row-actions > span.lock .button-unlock,
 table.plugins tr.active.unlocked .row-actions > span.lock .button-unlock {
@@ -93,4 +93,9 @@ table.plugins tr.hide {
 }
 table.plugins.mode-show-hidden tr.hide {
   display: table-row;
+}
+#screen-options-wrap #sujin-donation {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
