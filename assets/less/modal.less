@@ -1,0 +1,250 @@
+/**
+ * Modal
+ *
+ * @package     WordPress
+ * @subpackage  Plugin Manager PRO
+ * @since       0.0.1
+ * @author      Sujin 수진 Choi http://www.sujinc.com/
+*/
+
+#grouping-modal {
+	#content-wrapper {
+		background:#eee;
+		height: 100%;
+		left: 0;
+		position: fixed;
+		top: 0;
+		width: 255px;
+		z-index: 10000001;
+		.drop-shadow( 3px, 4px, 11px );
+
+		@media (max-width: 768px) {
+			width: 100%;
+		}
+
+		.button {
+			background-color:white;
+			border: none;
+			box-shadow: none;
+			-webkit-box-shadow:none;
+			border-radius: 0;
+			font-weight: 500;
+			text-shadow:none;
+		}
+
+		.button-primary {
+			background-color: #620056;
+		}
+
+		#content-container {
+			.container.button-container {
+				border-bottom:1px solid #ddd;
+				overflow:auto;
+
+				.close-button {
+					border-right:1px solid #ddd;
+					float: left;
+					height: 40px;
+					text-align: center;
+					text-decoration: none;
+					width:40px;
+					color:#444;
+
+					&:before{
+						font: 400 22px/45px dashicons;
+						content: "\f335";
+					}
+
+					&.modeDelete {
+						height: 110px;
+					}
+				}
+
+				#buttons {
+					align-items: flex-end;
+					display: flex;
+					flex-direction: column;
+					padding:6px 7px;
+				}
+			}
+
+			.container.content {
+				box-sizing: border-box;
+				height:100vh;
+				margin-top: -41px;
+				padding: 10px;
+				padding-top: 51px;
+
+				#scroll-container {
+					height:100%;
+					overflow-y: scroll;
+					overflow-x: hidden;
+				}
+			}
+
+			h3 {
+				margin-top: 0;
+			}
+
+			.group-list {
+				margin:0;
+				padding:0;
+
+				li {
+					font-size: 13.5px;
+					margin-bottom:4px;
+					padding: 6px 7px;
+
+					input {
+						border: none;
+						border-radius: 0;
+						height:13px;
+						width:13px;
+						min-width: 13px;
+
+						&.indeterminate:before {
+							float: left;
+							display: inline-block;
+							vertical-align: middle;
+							font: 800 17px/1 dashicons;
+							speak: none;
+							-webkit-font-smoothing: antialiased;
+							-moz-osx-font-smoothing: grayscale;
+
+							content: "\f460";
+							margin: -2px 0 0 -2px;
+							color: #1e8cbe;
+    					}
+					}
+
+					&.dndPlaceholder {
+						background-color: #ddd;
+						color: #ddd;
+
+						&:after {
+							content: ".";
+						}
+					}
+
+					&.dndDraggingSource {
+						display: none;
+					}
+				}
+			}
+
+			#create-form {
+				input[type="text"] {
+					box-shadow:none;
+					padding:7px;
+					width: 100%;
+					border:none;
+				}
+
+				textarea {
+					box-shadow:none;
+					height: 100px;
+					margin-top:10px;
+					padding:7px;
+					border:none;
+					width: 100%;
+				}
+
+				.list-color {
+					margin: 9px 0 0;
+					overflow:auto;
+					width: 100%;
+
+					li {
+						float: left;
+						margin:0;
+
+						a {
+							display: block;
+							padding: 5px 0;
+							text-align: center;
+							text-decoration: none;
+							width:39.1px;
+
+							&:hover {
+								color: inherit;
+							}
+
+							&:active {
+								border: none !important;
+								box-shadow: none !important;
+								outline:none !important;
+							}
+
+							&:focus {
+								border: none !important;
+								box-shadow: none !important;
+								outline:none !important;
+							}
+						}
+					}
+				}
+			}
+
+/*
+
+
+
+			#grouping-modal-error {
+				background-color: #A60000;
+				border-radius:5px;
+				color: white;
+				margin-top:14px;
+				padding:7px 10px;
+
+				p {
+					margin: 0;
+				}
+			}
+*/
+		}
+	}
+
+	#modal-loading-spinner {
+		height: 100%;
+		left: 0;
+		position: fixed;
+		top: 0;
+		width: 255px;
+		z-index: 10000000;
+		justify-content: center;
+		align-items: center;
+		display: flex;
+		flex-direction: column;
+
+		img {
+			background: white;
+			border-radius:10px;
+			.box-shadow(0px 0px 25px #333333);
+			padding:15px;
+		}
+	}
+
+/*
+	#modal-backgroud {
+		background: #FFF;
+		height: 100%;
+		left: 0;
+		.opacity(0.8);
+		position: fixed;
+		top: 0;
+		width: 100%;
+		z-index: 9999999;
+	}
+*/
+
+	// Mode:Loading
+	&.loading {
+		form {
+			z-index: 9999999;
+		}
+	}
+}
+
+.ng-hide:not(.ng-hide-animate) {
+    display: none !important;
+}

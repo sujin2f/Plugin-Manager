@@ -2,13 +2,18 @@
 /**
  * Init
  *
- * project	Plugin Manager
- * version: 5.0.0
- * Author: Sujin 수진 Choi
- * Author URI: http://www.sujinc.com/
+ * Bootstrap Class.
+ *
+ * @package     WordPress
+ * @subpackage  Plugin Manager PRO
+ * @since       0.0.1
+ * @author      Sujin 수진 Choi http://www.sujinc.com/
 */
 
-namespace PIGPR;
+// TODO : 그룹 보기 모드일 때 한글 깨짐.
+// TODO : 번역
+
+namespace PLGINMNGRPRO;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -16,177 +21,301 @@ if ( !defined( "ABSPATH" ) ) {
 	exit();
 }
 
-class Init {
-	private $Group, $Lock, $Hide, $ScreenOption;
-	public $upgrade = false;
+class Init extends Base {
+	/**
+	 * Colours
+	 *
+	 * @since  0.0.1
+	 * @access private
+	 *
+	 * @var bool $test_mode
+	 */
+	private $colours = array(
+		'Red'         => '#A60000',
+		'Orange'      => '#FF7000',
+		'Apricot'     => '#FFD060',
 
-	function __construct() {
-		add_action( 'wp_loaded', array( $this, 'Upgrade' ) );
+		'Blue'        => '#0020A0',
+		'LightBlue'   => '#3777CD',
+		'SkyBlue'     => '#B0C0EA',
 
-		if ( !is_admin() )
-			return false;
+		'Brown'       => '#464000',
+		'LightBrown'  => '#948700',
+		'Yellow'      => '#FFE900',
 
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_POST[ 'mode' ] ) && $_POST[ 'mode' ] == 'Plugin Manager' )
-			$this->ActivateObjects();
+		'Green'       => '#007039',
+		'LightGreen'  => '#67C700',
+		'PaleGreen'   => '#B5F167',
 
-		if ( is_multisite() )
-			add_action( 'plugins_loaded', array( $this, 'ActivatePlugin' ) );
-		else
-			$this->ActivatePlugin();
+		'DeepPurple'  => '#620056',
+		'Purple'      => '#A1008D',
+		'LightPurple' => '#EDA4D6',
+
+		'Black'       => '#000000',
+		'Grey'        => '#737373',
+		'White'       => '#FFFFFF',
+	);
+
+	/**
+	 * Constructor.
+	 *
+	 * Initialization and Setting the first hooking points.
+	 *
+	 * @since  0.0.1
+	 * @access public
+	 */
+	public function __construct() {
+		parent::__construct();
+
+		if ( ! is_admin() )
+			return;
+
+		add_action( 'admin_init', array( $this, 'activate_plugin' ) );
+		add_filter( 'wp_get_update_data', array( $this, 'set_update_data' ) );
 	}
 
-	private function ActivateObjects() {
-		$this->Group = new Group();
-		$this->Lock = new Lock();
-		$this->Hide = new Hide();
-		$this->ScreenOption = new ScreenOption();
+	public function set_update_data( $update_data )  {
+		All_Plugins::block_upgrade();
+		return $update_data;
 	}
 
-	public function ActivatePlugin() {
+	/**
+	 * Plugin Activation.
+	 *
+	 * @since  0.0.1
+	 * @access public
+	 *
+	 * @global string $pagenow
+	 */
+	public function activate_plugin() {
+		// Ajax
+		if ( $this->activate_ajax() )
+			return;
+
+		// Plugin Pages
 		global $pagenow;
-		if ( $pagenow !== "plugins.php" ) return false;
+		if ( $pagenow !== "plugins.php" )
+			return;
 
-		$this->ActivateObjects();
+		if ( !Database::is_tables_exist() )
+			Database::create_tables();
 
-		# 텍스트도메인
-		add_action( 'plugins_loaded', array( $this, 'LoadTextDomain' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'EnqueueScripts' ) );
-		add_filter( 'wp_redirect', array( $this, 'WP_Redirect' ) );
+		Database::remove_duplicate_plugins();
+		Database::update_plugins();
+
+		if ( ! Database::is_updated() )
+			Database::upgrade_from_normal_version();
+
+		// Deactivate Older Version
+		if ( defined( 'PIGPR_PLUGIN_NAME' ) ) {
+			deactivate_plugins( PIGPR_PLUGIN_DIR . PIGPR_PLUGIN_FILE_NAME );
+		}
+
+		// Set Vars
+		new Modal();
+		new Table();
+		new All_Plugins();
+
+		// Text Domain, Script, Style, and Redirection
+		add_action( 'plugins_loaded',        array( $this, 'load_text_domain' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_filter( 'wp_redirect',           array( $this, 'wp_redirect' ) );
+
+		// Modifying Admin HTML for Angular
+		add_action( 'admin_xml_ns',          array( $this, 'add_angular_app' ) );
+		add_action( 'admin_head',            array( $this, 'add_angular_controller' ) );
+		add_action( 'admin_footer',          array( $this, 'close_angular_controller' ) );
+		add_action( 'admin_footer',          array( $this, 'print_colour_style' ) );
 	}
 
-	public function LoadTextDomain() {
-		$lang_dir = PIGPR_PLUGIN_NAME . '/languages';
-		load_plugin_textdomain( PIGPR_TEXTDOMAIN, 'wp-content/plugins/' . $lang_dir, $lang_dir );
+	/**
+	 * Ajax.
+	 *
+	 * @since  0.0.1
+	 * @access private
+	 *
+	 * @return bool
+	 *
+	 * @global bool   DOING_AJAX
+	 * @global string $_REQUEST['action'] Ajax Mode.
+	 */
+	private function activate_ajax() {
+		// AJAX
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['action'] ) && strstr( $_REQUEST['action'], 'Plugin Manager Pro' ) !== false ) {
+			check_ajax_referer( PLGINMNGRPRO_TEXTDOMAIN, 'security' );
+			new Ajax();
+
+			return true;
+		}
+
+		return false;
 	}
 
-	public function EnqueueScripts() {
+	/**
+	 * Text Domain.
+	 *
+	 * @since  0.0.1
+	 * @access public
+	 *
+	 * @global string PLGINMNGRPRO_PLUGIN_NAME
+	 *
+	 * @return void
+	 */
+	public function load_text_domain() {
+		$lang_dir = PLGINMNGRPRO_PLUGIN_NAME . '/languages';
+		load_plugin_textdomain( PLGINMNGRPRO_TEXTDOMAIN, 'wp-content/plugins/' . $lang_dir, $lang_dir );
+	}
+
+	/**
+	 * Load Scripts and Styles.
+	 *
+	 * @since  0.0.1
+	 * @access public
+	 *
+	 * @global string PLGINMNGRPRO_ASSETS_URL
+	 * @global string PLGINMNGRPRO_TEXTDOMAIN
+	 * @global string PLGINMNGRPRO_VERSION_NUM
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+		wp_enqueue_script( 'angular',               PLGINMNGRPRO_ASSETS_URL . 'script/angular.min.js' );
+// 		wp_enqueue_script( 'angular-animate',       PLGINMNGRPRO_ASSETS_URL . 'script/angular-animate.min.js' );
+		wp_enqueue_script( 'angular-indeterminate', PLGINMNGRPRO_ASSETS_URL . 'script/angular-indeterminate.min.js' );
+
 		# Adding Grouping Actions on Dropdown Menu
-		wp_enqueue_script( 'plugin-grouper-group', PIGPR_ASSETS_URL . 'script/min/plugin_grouper-min.js', array( 'jquery' ), '4.0.0' );
+		$script_url = PLGINMNGRPRO_ASSETS_URL . 'script-min/plugin-manager-min.js';
+		$style_url  = PLGINMNGRPRO_ASSETS_URL . 'css/plugin-manager.css';
 
-		wp_enqueue_style( 'plugin-grouper', PIGPR_ASSETS_URL . 'css/plugin-grouper.css' );
+		wp_enqueue_script( PLGINMNGRPRO_TEXTDOMAIN, $script_url, array( 'angular' ), PLGINMNGRPRO_VERSION_NUM );
+		wp_enqueue_style(  PLGINMNGRPRO_TEXTDOMAIN, $style_url,  array(), PLGINMNGRPRO_VERSION_NUM );
 
-		wp_enqueue_script( 'spectrum', PIGPR_VENDOR_URL . 'spectrum.js', array( 'jquery' ), '4.0.0' );
-		wp_enqueue_style( 'spectrum', PIGPR_VENDOR_URL . 'spectrum.css' );
+		/**
+		 * Localization.
+		 *
+		 * Use objectL10n.{key} in your javascript file.
+		 */
+		// Localization // objectL10n.delete_group
 
-		# Localization // objectL10n.delete_group
-		wp_localize_script( 'plugin-grouper-group', 'objectL10n', array(
-			'plugin_group'  => __( 'Plugin Group', PIGPR_TEXTDOMAIN ),
-			'delete_group' => __( 'Delete Group', PIGPR_TEXTDOMAIN ),
-			'show' => __( 'Show', PIGPR_TEXTDOMAIN ),
-			'hide' => __( 'Hide', PIGPR_TEXTDOMAIN ),
-			'lock' => __( 'Lock', PIGPR_TEXTDOMAIN ),
-			'unlock' => __( 'Unlock', PIGPR_TEXTDOMAIN ),
-		) );
+		wp_localize_script( PLGINMNGRPRO_TEXTDOMAIN, 'objectL10n', array(
+			'message'  => array(
+				'text_length' => __( 'Group name is empty.',  PLGINMNGRPRO_TEXTDOMAIN ),
+				'something'   => __( 'Something went wrong.', PLGINMNGRPRO_TEXTDOMAIN ),
+			),
+
+			'terms'    => array(
+				'group'  => __( 'Group',  PLGINMNGRPRO_TEXTDOMAIN ),
+				'lock'   => __( 'Lock',   PLGINMNGRPRO_TEXTDOMAIN ),
+				'unlock' => __( 'Unlock', PLGINMNGRPRO_TEXTDOMAIN ),
+				'hide'   => __( 'Hide',   PLGINMNGRPRO_TEXTDOMAIN ),
+				'unhide' => __( 'Unhide', PLGINMNGRPRO_TEXTDOMAIN ),
+			),
+
+			'colours'      => $this->colours,
+			'settings'     => Option::get(),
+			'data'         => Database::get_json_array( $this->group ),
+			'plugin_group' => $this->group,
+
+			'nonce'        => wp_create_nonce( PLGINMNGRPRO_TEXTDOMAIN ),
+		));
 	}
 
-	public function WP_Redirect( $location ) {
-		if ( isset( $_REQUEST['plugin_group'] ) && isset( $_REQUEST['action'] ) && $_REQUEST['action'] !== 'delete_group' ) {
-			$location = add_query_arg( 'plugin_group', $_REQUEST['plugin_group'], $location );
+	public function add_angular_app() {
+		echo ' ng-app="PluginManager" ';
+	}
+
+	public function add_angular_controller() {
+		echo '<div ng-controller="PluginManagerController" ng-show="ng_loaded" class="ng-hide">';
+	}
+
+	public function close_angular_controller() {
+		echo '</div>';
+	}
+
+	public function print_colour_style() {
+		?>
+		<style>
+			<?php foreach( $this->colours as $key => $colour ) : ?>
+			.<?php echo $key ?> {
+				background-color: <?php echo $colour ?> !important;
+				border-color    : <?php echo $colour ?> !important;
+				color           : <?php echo $this->get_contrast_colour( $colour ); ?> !important;
+			}
+
+			.<?php echo $key ?> .count {
+				color           : <?php echo $colour ?> !important;
+				background-color: <?php echo $this->get_contrast_colour( $colour ); ?> !important;
+			}
+
+			.<?php echo $key ?> .button {
+				color           : <?php echo $colour ?> !important;
+				background-color: <?php echo $this->get_contrast_colour( $colour ); ?> !important;
+			}
+			<?php endforeach; ?>
+		</style>
+		<?php
+	}
+
+	/**
+	 * Get black or white colour along with the input colour.
+	 *
+	 * @since  0.0.1
+	 * @access public
+	 *
+	 * @param  string $hex
+	 *
+	 * @return string Black or white colour.
+	 */
+	private function get_contrast_colour( $hex ) {
+		$hex = str_replace( '#', '', $hex );
+
+		if( strlen( $hex ) == 3 ) {
+			$r = hexdec( substr( $hex, 0, 1 ).substr( $hex, 0, 1 ) );
+			$g = hexdec( substr( $hex, 1, 1 ).substr( $hex, 1, 1 ) );
+			$b = hexdec( substr( $hex, 2, 1 ).substr( $hex, 2, 1 ) );
+		} else {
+			$r = hexdec( substr( $hex, 0, 2 ) );
+			$g = hexdec( substr( $hex, 2, 2 ) );
+			$b = hexdec( substr( $hex, 4, 2 ) );
+		}
+
+		$contrast = ( $r + $g + $b ) / 3;
+
+		return ( $contrast < 128 ) ? "#FFFFFF" : "#000000";
+	}
+
+	/**
+	 * Change Redirection Method.
+	 *
+	 * If HTTP header was already sent, print meta HTML tag.
+	 *
+	 * @since  0.0.1
+	 * @access public
+	 *
+	 * @param  string $location
+	 *
+	 * @return string
+	 */
+	public function wp_redirect( $location ) {
+		if ( headers_sent() ) {
+			$this->redirect_html_meta( $location );
 		}
 
 		return $location;
 	}
 
-	public function Upgrade() {
-		$current_version = get_option( 'PIGPR_VERSION_NUM' );
-		$upgraded = false;
-
-		// From Version 1.0.0
-		if ( version_compare( $current_version, '2.0.0', '<' ) ) {
-			$this->Upgrade2();
-			$upgraded = true;
-		}
-
-		if ( version_compare( $current_version, '5.0.0', '<' ) ) {
-			$this->Upgrade5();
-			$upgraded = true;
-		}
-
-		if ( $upgraded )
-			update_option( 'PIGPR_VERSION_NUM', PIGPR_VERSION_NUM );
-	}
-
-	private function Upgrade2() {
-		$groups = get_option( 'plugin_groups' );
-
-		if ( $groups ) {
-			foreach( $groups as &$group ) {
-				if ( !is_array( $group ) ) {
-					$group = array(
-						'color' => '#666666',
-						'name' => $group
-					);
-				}
-			}
-		}
-
-		update_option( 'plugin_groups', $groups );
-		delete_option( 'plugin_groups' );
-	}
-
-	private function Upgrade5() {
-		$plugins = get_plugins();
-
-		$plugin_info = get_site_transient( 'update_plugins' );
-
-		foreach ( (array) $plugins as $plugin_file => $plugin_data ) {
-			// Extra info if known. array_merge() ensures $plugin_data has precedence if keys collide.
-			if ( isset( $plugin_info->response[ $plugin_file ] ) ) {
-				$plugins[ $plugin_file ] = $plugin_data = array_merge( (array) $plugin_info->response[ $plugin_file ], $plugin_data );
-
-			} elseif ( isset( $plugin_info->no_update[ $plugin_file ] ) ) {
-				$plugins[ $plugin_file ] = $plugin_data = array_merge( (array) $plugin_info->no_update[ $plugin_file ], $plugin_data );
-			}
-		}
-
-		$plugin_groups_match = get_option( 'plugin_groups_match' );
-		$groups_plugin_match = get_option( 'groups_plugin_match' );
-		$plugin_groups_match_new = array();
-		$groups_plugin_match_new = array();
-
-		// Delete Empty Array
-		foreach( $plugin_groups_match as $key => $value ) {
-			if ( count( $value ) ) {
-				$plugin_groups_match_new[ $key ] = $plugin_groups_match[ $key ];
-			}
-		}
-
-
-		update_option( 'plugin_groups_match', $plugin_groups_match_new );
-
-		$plugin_groups_match = $plugin_groups_match_new;
-		$plugin_groups_match_new = array();
-
-		foreach( $plugin_groups_match as $option_plugin_key => $option_plugin_value ) {
-			$matched = false;
-			foreach( $plugins as $plugin_key => $plugin ) {
-				if ( strstr( $plugin_key, $option_plugin_key . '/' ) !== false ) {
-					$matched = $plugin_key;
-				}
-
-				if ( $plugin[ 'slug' ] == $option_plugin_key ) {
-					$matched = $plugin_key;
-				}
-
-				if ( sanitize_title( $plugin[ 'Name' ] ) == $option_plugin_key ) {
-					$matched = $plugin_key;
-				}
-			}
-
-			if ( $matched ) {
-				$plugin_groups_match_new[ $matched ] = $plugin_groups_match[ $option_plugin_key ];
-
-				foreach( $groups_plugin_match as $option_group_key => $option_group_value ) {
-					foreach( $option_group_value as $key => $value ) {
-						if ( $value == $option_plugin_key ) {
-							$groups_plugin_match_new[ $option_group_key ][ $matched ] = $groups_plugin_match[ $option_group_key ][ $option_plugin_key ];
-						}
-					}
-				}
-			}
-		}
-
-		update_option( 'plugin_groups_match', $plugin_groups_match_new );
-		update_option( 'groups_plugin_match', $groups_plugin_match_new );
+	/**
+	 * Print meta HTML tag for redirection.
+	 *
+	 * @since  0.0.1
+	 * @access private
+	 *
+	 * @param  string $location
+	 *
+	 * @return void
+	 */
+	private function redirect_html_meta( $location ) {
+		printf( '<meta http-equiv="refresh" content="0; url=%s">', $location );
+		wp_die();
 	}
 }

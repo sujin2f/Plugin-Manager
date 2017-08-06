@@ -18,7 +18,7 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class ScreenOption {
-	public $option = [];
+	public $option = array();
 	public $hide_text, $show_hidden;
 
 	function __construct() {
@@ -53,6 +53,16 @@ class ScreenOption {
 			<a href="<?php echo add_query_arg( array( 'mode' => 'delete_group', 'group' => $key ) ) ?>" class="btn-delete_group button">Delete <?php echo $value[ 'name' ] ?></a>
 			<?php } ?>
 		</fieldset>
+
+		<div id="sujin-donation">
+			<img src="<?php echo PIGPR_ASSETS_URL ?>images/plugin_danation_link.png" usemap="#sujin-donation" />
+
+			<map name="sujin-donation">
+			  <area shape="rect" coords="0,0,200,100" href="http://www.sujinc.com" alt="Home Page" target="_blank" />
+			  <area shape="rect" coords="0,100,200,150" href="http://www.sujinc.com/donation" alt="Donation" target="_blank" />
+			  <area shape="rect" coords="0,150,200,200" href="mailto:sujin.2f@gmail.com" alt="Hire Me!" />
+			</map>
+		</div>
 		<?php
 		$screen_settings .= ob_get_clean();
 
