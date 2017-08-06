@@ -179,15 +179,15 @@ class Init extends Base {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( 'angular',               PLGINMNGRPRO_ASSETS_URL . 'script/angular.min.js' );
-// 		wp_enqueue_script( 'angular-animate',       PLGINMNGRPRO_ASSETS_URL . 'script/angular-animate.min.js' );
-		wp_enqueue_script( 'angular-indeterminate', PLGINMNGRPRO_ASSETS_URL . 'script/angular-indeterminate.min.js' );
+		wp_enqueue_script( 'angular',                     PLGINMNGRPRO_ASSETS_URL . 'angular/angular.min.js' );
+		wp_enqueue_script( 'angular-drag-and-drop-lists', PLGINMNGRPRO_ASSETS_URL . 'angular/angular-drag-and-drop-lists.js', array( 'angular' ) );
+		wp_enqueue_script( 'angular-indeterminate',       PLGINMNGRPRO_ASSETS_URL . 'angular/angular-indeterminate.min.js'  , array( 'angular' ) );
 
 		# Adding Grouping Actions on Dropdown Menu
-		$script_url = PLGINMNGRPRO_ASSETS_URL . 'script-min/plugin-manager-min.js';
-		$style_url  = PLGINMNGRPRO_ASSETS_URL . 'css/plugin-manager.css';
+		$script_url = PLGINMNGRPRO_ASSETS_URL . 'dist/scripts/app.js';
+		$style_url  = PLGINMNGRPRO_ASSETS_URL . 'dist/css/style.css';
 
-		wp_enqueue_script( PLGINMNGRPRO_TEXTDOMAIN, $script_url, array( 'angular' ), PLGINMNGRPRO_VERSION_NUM );
+		wp_enqueue_script( PLGINMNGRPRO_TEXTDOMAIN, $script_url, array(  ), PLGINMNGRPRO_VERSION_NUM );
 		wp_enqueue_style(  PLGINMNGRPRO_TEXTDOMAIN, $style_url,  array(), PLGINMNGRPRO_VERSION_NUM );
 
 		/**

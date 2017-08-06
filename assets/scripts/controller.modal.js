@@ -2,9 +2,9 @@
  * Grouping Modal
  *
  * @package     WordPress
- * @subpackage  Plugin Manager PRO
- * @since       0.0.1
- * @author      Sujin 수진 Choi http://www.sujinc.com/
+ * @subpackage  Plugin Manager
+ * @since       6.0.0
+ * @author      Sujin 수진 Choi http://www.sujinc.com/donation
 */
 
 angular.module( 'PluginManager' )
@@ -104,10 +104,12 @@ angular.module( 'PluginManager' )
 			$scope.status.errorMsg  = false;
 			$scope.status.isLoading = true;
 
+			let plugin_id;
+
 			if ( typeof $scope.status.plugin_id == 'object' ) {
-				var plugin_id = $scope.status.plugin_id.join( '*!.*!' );
+				plugin_id = $scope.status.plugin_id.join( '*!.*!' );
 			} else {
-				var plugin_id = $scope.status.plugin_id;
+				plugin_id = $scope.status.plugin_id;
 			}
 
 			var data = {
@@ -165,8 +167,6 @@ angular.module( 'PluginManager' )
 					$scope.status.isLoading = false;
 				}
 			);
-
-			console.log( groups );
 		};
 		$scope.groups.fn.showEditGroup = function( group_key ) {
 			var group = dataService.get.groups();
@@ -236,7 +236,7 @@ angular.module( 'PluginManager' )
 				}
 			);
 		};
-		$scope.createForm.fn.closeForm   = function( ignoreGoBack) {
+		$scope.createForm.fn.closeForm = function( ignoreGoBack) {
 			$scope.status.errorMsg             = false;
 			$scope.createForm.data.name        = '';
 			$scope.createForm.data.description = '';
@@ -321,7 +321,7 @@ angular.module( 'PluginManager' )
 			};
 
 			$scope.status.isLoading = true;
-			$scope.createForm.data.action    = 'Plugin Manager Pro : Edit Group';
+			$scope.createForm.data.action = 'Plugin Manager Pro : Edit Group';
 
 			$http({
 				url   : ajaxurl,
@@ -350,7 +350,7 @@ angular.module( 'PluginManager' )
 			};
 
 			$scope.status.isLoading = true;
-			$scope.createForm.data.action    = 'Plugin Manager Pro : Delete Group';
+			$scope.createForm.data.action = 'Plugin Manager Pro : Delete Group';
 
 			$http({
 				url   : ajaxurl,

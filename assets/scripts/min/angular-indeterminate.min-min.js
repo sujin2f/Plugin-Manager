@@ -1,1 +1,0 @@
-!function(){"use strict";angular.module("ui.indeterminate",[]).directive("uiIndeterminate",[function(){return{compile:function(e,n){return n.type&&"checkbox"===n.type.toLowerCase()?function(e,n,t){e.$watch(t.uiIndeterminate,function(e){n[0].indeterminate=!!e})}:angular.noop}}}])}();

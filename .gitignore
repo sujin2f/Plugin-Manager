@@ -1,3 +1,8 @@
 config.codekit
 Icon?
 *.swp
+node_modules
+*.min.*
+dist
+.DS_Store
+package-lock.json

@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name:   Plugin Manager Pro
+ * Plugin Name:   Plugin Manager
  * Plugin URI:    http://www.sujinc.com/
  * Description:   Too many plugins bothers you? Put them into group!
- * Version:       0.0.1
+ * Version:       6.0.0
  * Author:        Sujin 수진 Choi
- * Author URI:    http://www.sujinc.com/
+ * Author URI:    http://www.sujinc.com/donation
  * License:       GPLv2 or later
- * Text Domain:   plugin-manager-pro
+ * Text Domain:   plugin-manager
  */
 
 if ( !defined( "ABSPATH" ) ) {
