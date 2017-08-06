@@ -10,7 +10,7 @@
 angular.module( 'PluginManager' )
 	.service( 'dataService', function() {
 		var service = {};
-console.log(objectL10n);
+
 		service.settings     = objectL10n.settings;
 		service.data         = objectL10n.data;
 		service.colours      = objectL10n.colours;
