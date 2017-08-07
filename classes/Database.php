@@ -1033,8 +1033,8 @@ class Database {
 		if ( $plugin_groups ) {
 			foreach( $plugin_groups as $key => $groups ) {
 				$setting = array(
-					'group_name' => $groups[ 'name' ],
-					'colour' => 'Red',
+					'group_name'  => $groups[ 'name' ],
+					'colour'      => $groups[ 'color' ],
 					'description' => '',
 					'hidden_main' => false,
 				);
