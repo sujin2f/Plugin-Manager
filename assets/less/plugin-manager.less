@@ -1,14 +1,21 @@
 /**
+ * LESS Bootstrap File
  *
- * LESS
- *
- * project	Plugin Manager
- * version: 5.0.0
- * Author: Sujin 수진 Choi
- * Author URI: http://www.sujinc.com/
- *
+ * @package     WordPress
+ * @subpackage  Plugin Manager PRO
+ * @since       0.0.1
+ * @author      Sujin 수진 Choi http://www.sujinc.com/
 */
 
+@import "functions.less";
+
+@import "list.less";
+@import "modal.less";
+@import "group.less";
+
+
+
+/*
 .lock-template() {
   tr.inactive, tr.active {
 	  // 일단 대쉬콘, 체크박스, 버튼을 다 없애고
@@ -86,21 +93,6 @@
 	}
 }
 
-table.plugins {
-	// Description의 그룹 이름
-	td.column-description {
-		.groups {
-			margin-bottom:10px;
-
-			a {
-				display:inline-block;
-				background-color:#EEEEEE;
-				padding:3px 5px;
-				border-radius:2px;
-				margin-right:2px;
-			}
-		}
-	}
 
 	// 그룹 창
 	.plugin_grouper_wrap {
@@ -108,22 +100,6 @@ table.plugins {
 			padding: 0 0 25px 47px;
 			box-shadow:inset #EEEEEE 0 0 20px !important;
 
-			.sp-replacer {
-				padding:0;
-				border: 0;
-				background-color:transparent;
-				margin-left:5px;
-
-				.sp-preview {
-					width: 15px;
-					height: 15px;
-					border: #FFFFFF;
-				}
-
-				.sp-dd {
-					display: none;
-				}
-			}
 		}
 	}
 
@@ -146,3 +122,4 @@ table.plugins {
 	right:0;
 	top:0;
 }
+*/
