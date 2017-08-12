@@ -9,11 +9,15 @@
 
 namespace Sujin\Plugin\PluginMgr;
 
+use Sujin\Plugin\PluginMgr\Constants\Colour;
+
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
 	header( "HTTP/1.1 403 Forbidden" );
 	exit();
 }
+
+// Colour::$COLOURS
 
 class Database {
 	/**
@@ -80,6 +84,11 @@ class Database {
 		), ARRAY_A );
 
 		foreach( $groups as &$group ) {
+			if ( substr( $group['colour'], 0, 1 ) == '#' ) {
+				$group['colourStyle'] = sprintf( 'background-color: %s !important', $group['colour'] );
+				$group['colour']      = 'Black';
+			}
+
 			$group[ 'hidden_main' ] = (bool) $group[ 'hidden_main' ];
 			$group[ 'plugins' ] = self::get_plugins_by_group( $group );
 		}
@@ -241,10 +250,18 @@ class Database {
 
 		foreach( $plugins_temp as $plugin ) {
 			$plugins[ $plugin['file_name'] ] = $plugin;
+
+			foreach( $plugins[ $plugin['file_name'] ][ 'groups' ] as &$group ) {
+				if ( substr( $group['colour'], 0, 1 ) == '#' ) {
+					$group['colourStyle'] = sprintf( 'background-color: %s !important', $group['colour'] );
+					$group['colour']      = 'Black';
+				}
+			}
 		}
 
 		if ( empty( $selected_group ) ) {
 			unset($plugin);
+			unset($group);
 
 			foreach( $plugins as &$plugin ) {
 				foreach( $plugin[ 'groups' ] as $group ) {

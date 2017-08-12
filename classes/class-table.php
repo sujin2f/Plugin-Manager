@@ -232,7 +232,7 @@ class Table extends Plugin_Base {
 					</a>
 				</li>
 
-				<li ng-repeat="group in getGroups()" class="colour group {{group.colour}}">
+				<li ng-repeat="group in getGroups()" class="colour group {{group.colour}}" style="{{group.colourStyle}}">
 					<a href="<?php echo $this->get_plugins_admin_uri() ?>?group={{group.ID}}" ng-class="{'current':plugin_group == group.ID}">
 						{{group.group_name}}
 						<span class="count">{{group.count}}</span>
@@ -290,7 +290,7 @@ class Table extends Plugin_Base {
 	public function print_groups_on_description( $plugin_meta, $plugin_file, $plugin_data ) {
 		?>
 		<div class="groups">
-			<a ng-repeat="group in getPluginGroups('<?php echo $plugin_file ?>')" href="<?php $this->get_plugins_admin_uri() ?>?group={{group.ID}}" class="{{group.colour}}">{{group.group_name}}</a>
+			<a ng-repeat="group in getPluginGroups('<?php echo $plugin_file ?>')" href="<?php $this->get_plugins_admin_uri() ?>?group={{group.ID}}" class="{{group.colour}}" style="{{group.colourStyle}}">{{group.group_name}}</a>
 		</div>
 		<?php
 
