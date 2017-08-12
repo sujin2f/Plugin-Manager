@@ -5,9 +5,6 @@
  * @package Plugin Manager
  * @since   6.0.0
  * @author  Sujin 수진 Choi http://www.sujinc.com/donation
- *
- * @todo    그룹 보기 모드일 때 한글 깨짐.
- * @todo    번역
 */
 
 namespace Sujin\Plugin\PluginMgr;
@@ -38,6 +35,7 @@ class Bootstrap extends Plugin_Base {
 		if ( ! is_admin() )
 			return;
 
+		add_filter( 'plugin_row_meta',    array( $this, 'add_plugin_manager_meta'), 15, 3 );
 		add_action( 'admin_init',         array( $this, 'activate_plugin' ) );
 		add_filter( 'wp_get_update_data', array( $this, 'set_update_data' ) );
 	}
@@ -280,5 +278,13 @@ class Bootstrap extends Plugin_Base {
 	private function redirect_html_meta( $location ) {
 		printf( '<meta http-equiv="refresh" content="0; url=%s">', $location );
 		wp_die();
+	}
+
+	public function add_plugin_manager_meta( $plugin_meta, $plugin_file, $plugin_data ) {
+		if ( $plugin_data['Name'] === SUJIN_PLUGIN_MGR_NAME ) {
+			$plugin_meta[] = '<a href="http://sujinc.com/donation"><span class="dashicons dashicons-carrot"></span> Donation</a>';
+		}
+
+		return $plugin_meta;
 	}
 }

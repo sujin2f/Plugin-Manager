@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name:   Plugin Manager
- * Plugin URI:    http://www.sujinc.com/
+ * Plugin URI:    https://wordpress.org/plugins/plugin-grouper/
  * Description:   Too many plugins bothers you? Put them into group!
  * Version:       6.0.0
  * Author:        Sujin 수진 Choi
- * Author URI:    http://www.sujinc.com/donation
+ * Author URI:    http://www.sujinc.com/
  * License:       GPLv2 or later
  * Text Domain:   plugin-manager
  */

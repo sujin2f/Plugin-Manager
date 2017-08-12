@@ -9,8 +9,6 @@
 
 namespace Sujin\Plugin\PluginMgr;
 
-use Sujin\Plugin\PluginMgr\Traits\Config;
-
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
 	header( "HTTP/1.1 403 Forbidden" );
@@ -18,8 +16,6 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class Database {
-	use Config;
-
 	/**
 	 * Table Names
 	 *
