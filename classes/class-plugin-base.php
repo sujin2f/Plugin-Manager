@@ -1,16 +1,13 @@
 <?php
 /**
- * Base
+ * Base Class to share
  *
- * Base Class.
- *
- * @package     WordPress
- * @subpackage  Plugin Manager PRO
- * @since       0.0.1
- * @author      Sujin 수진 Choi http://www.sujinc.com/
+ * @package Plugin Manager
+ * @since   6.0.0
+ * @author  Sujin 수진 Choi http://www.sujinc.com/donation
 */
 
-namespace PLGINMNGRPRO;
+namespace Sujin\Plugin\PluginMgr;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -18,7 +15,7 @@ if ( !defined( "ABSPATH" ) ) {
 	exit();
 }
 
-class Base {
+abstract class Plugin_Base {
 	/**
 	 * Test Mode
 	 *

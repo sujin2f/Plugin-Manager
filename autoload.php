@@ -1,33 +1,59 @@
 <?php
 /**
- *
- * Plugin Manager Pro
+ * Plugin Manager
  *
  * @author  Sujin 수진 Choi
- * @package PLGINMNGRPRO
- * @version 0.0.1
- * @website http://www.sujinc.com/
+ * @package plugin-manager
+ * @version 6.0.0
+ * @website http://www.sujinc.com/donation
  *
- * Licensed under The MIT License
+ * Licensed under The GPL License
  * Redistributions of files must retain the above copyright notice
- *
  */
 
-if ( !function_exists( 'PLGINMNGRPRO' ) ) {
-	function load_plugin_manager_pro() {
+if ( !function_exists( 'autoload_sujin_plugin_manager' ) ) {
+	function autoload_sujin_plugin_manager() {
 		spl_autoload_register( function( $class_name ) {
-			$namespace = 'PLGINMNGRPRO\\';
+			$namespace = 'Sujin\\Plugin\\PluginMgr\\';
 
-			if ( stripos( $class_name, $namespace ) === false )
-		        return;
+			if ( stripos( $class_name, $namespace ) === false ) {
+				return;
+			}
 
 			$source_dir = __DIR__ . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR;
-			$file_name  = str_replace( array( $namespace, '\\' ), array( $source_dir, DIRECTORY_SEPARATOR ), $class_name ) . '.php';
 
-			if ( is_readable( $file_name ) )
-				include $file_name;
+			// Delete Namespace
+			$path = str_replace( $namespace, '', $class_name ) . '.php';
+			$path = explode( '\\', $path );
+
+			// Separate Filename and Path
+			$file_name = array_pop( $path );
+
+			// Change Path to path-name/path-name
+			$path = array_map( function( $string ) {
+				$out = array();
+
+				preg_match_all( '/((?:^|[A-Z])[a-z]+)/', $string, $matches );
+				foreach( $matches[0] as $match ) {
+					$out[] = strtolower( $match );
+				}
+
+				return implode( '-', $out );
+			}, $path );
+			$path = implode( DIRECTORY_SEPARATOR, $path );
+
+			// Change Filename to class-class-name.php
+			$file_name = strtolower( $file_name );
+			$file_name = str_replace( '_', '-', $file_name );
+			$file_name = '/class-' . $file_name;
+
+			$file_name = $source_dir . $path . $file_name;
+
+			if ( is_readable( $file_name ) ) {
+				include_once( $file_name );
+			}
 		});
 	}
 
-	load_plugin_manager_pro();
+	autoload_sujin_plugin_manager();
 }

@@ -1,16 +1,15 @@
 <?php
 /**
- * Table
+ * Table Controller
  *
- * Manage plugins as groups.
- *
- * @package     WordPress
- * @subpackage  Plugin Manager PRO
- * @since       0.0.1
- * @author      Sujin 수진 Choi http://www.sujinc.com/
+ * @package Plugin Manager
+ * @since   6.0.0
+ * @author  Sujin 수진 Choi http://www.sujinc.com/donation
 */
 
-namespace PLGINMNGRPRO;
+namespace Sujin\Plugin\PluginMgr;
+
+use Sujin\Plugin\PluginMgr\Traits\Config;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -18,7 +17,9 @@ if ( !defined( "ABSPATH" ) ) {
 	exit();
 }
 
-class Table extends Base {
+class Table extends Plugin_Base {
+	use Config;
+
 	/**
 	 * Constructor.
 	 *
@@ -94,7 +95,7 @@ class Table extends Base {
 				{{ mode_show_hidden ? \'%s\' : \'%s\'}}
 				<span class="count">{{num_of_hidden()}}</span>
 			</a>
-			', __( 'Hide Hidden', PLGINMNGRPRO_TEXTDOMAIN ), __( 'Show Hidden', PLGINMNGRPRO_TEXTDOMAIN ) );
+			', __( 'Hide Hidden', SUJIN_PLUGIN_MGR_SLUG ), __( 'Show Hidden', SUJIN_PLUGIN_MGR_SLUG ) );
 		echo '<div class="clear" />';
 
 		if ( ! empty( $this->group ) && $this->group !== 'not' ) {
@@ -179,9 +180,9 @@ class Table extends Base {
 		<?php
 		$hide_html = ob_get_clean();
 
-		$actions['group'] = sprintf( $group_html, $plugin_file, $text_class, __( 'Group', PLGINMNGRPRO_TEXTDOMAIN ) );
-		$actions['lock']  = sprintf( $lock_html, $plugin_file, $plugin_file, $text_class, $plugin_file, __( 'Unlock', PLGINMNGRPRO_TEXTDOMAIN ), __( 'Lock', PLGINMNGRPRO_TEXTDOMAIN ) );
-		$actions['hide']  = sprintf( $hide_html, $plugin_file, $plugin_file, $text_class, $plugin_file, __( 'Unhide', PLGINMNGRPRO_TEXTDOMAIN ), __( 'Hide', PLGINMNGRPRO_TEXTDOMAIN ) );
+		$actions['group'] = sprintf( $group_html, $plugin_file, $text_class, __( 'Group', SUJIN_PLUGIN_MGR_SLUG ) );
+		$actions['lock']  = sprintf( $lock_html, $plugin_file, $plugin_file, $text_class, $plugin_file, __( 'Unlock', SUJIN_PLUGIN_MGR_SLUG ), __( 'Lock', SUJIN_PLUGIN_MGR_SLUG ) );
+		$actions['hide']  = sprintf( $hide_html, $plugin_file, $plugin_file, $text_class, $plugin_file, __( 'Unhide', SUJIN_PLUGIN_MGR_SLUG ), __( 'Hide', SUJIN_PLUGIN_MGR_SLUG ) );
 
 		return $actions;
 	}
@@ -217,16 +218,16 @@ class Table extends Base {
 		?>
 		<section ng-controller="MenuController as menu" ng-show="showMenu" class="ng-hide {{key}}">
 			<ul class='subsubsub plugin-groups'>
-				<li><strong><?php _e( 'Groups', PLGINMNGRPRO_TEXTDOMAIN ) ?></strong></li>
+				<li><strong><?php _e( 'Groups', SUJIN_PLUGIN_MGR_SLUG ) ?></strong></li>
 				<li class="">
 					<a href="<?php echo $this->get_plugins_admin_uri() ?>" class="<?php echo ( empty( $this->group ) ) ? 'current' : '' ?>">
-						<?php _e( 'All', PLGINMNGRPRO_TEXTDOMAIN ) ?>
+						<?php _e( 'All', SUJIN_PLUGIN_MGR_SLUG ) ?>
 						<span class="count">({{ getNumPlugins()}} )</span>
 					</a>
 				</li>
 				<li class="not-in-any-groups">
 					<a href="<?php echo $this->get_plugins_admin_uri() ?>?group=not" class="<?php echo ( $this->group == 'not' ) ? 'current' : '' ?>">
-						<?php _e( 'None', PLGINMNGRPRO_TEXTDOMAIN ) ?>
+						<?php _e( 'None', SUJIN_PLUGIN_MGR_SLUG ) ?>
 						<span class="count">({{numNoneGroup()}})</span>
 					</a>
 				</li>

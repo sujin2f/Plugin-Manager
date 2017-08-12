@@ -1,19 +1,19 @@
 <?php
 /**
- * Init
+ * Bootstrap
  *
- * Bootstrap Class.
+ * @package Plugin Manager
+ * @since   6.0.0
+ * @author  Sujin 수진 Choi http://www.sujinc.com/donation
  *
- * @package     WordPress
- * @subpackage  Plugin Manager PRO
- * @since       0.0.1
- * @author      Sujin 수진 Choi http://www.sujinc.com/
+ * @todo    그룹 보기 모드일 때 한글 깨짐.
+ * @todo    번역
 */
 
-// TODO : 그룹 보기 모드일 때 한글 깨짐.
-// TODO : 번역
+namespace Sujin\Plugin\PluginMgr;
 
-namespace PLGINMNGRPRO;
+use Sujin\Plugin\PluginMgr\Traits\Config;
+use Sujin\Plugin\PluginMgr\Constants\Colour;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -21,40 +21,8 @@ if ( !defined( "ABSPATH" ) ) {
 	exit();
 }
 
-class Init extends Base {
-	/**
-	 * Colours
-	 *
-	 * @since  0.0.1
-	 * @access private
-	 *
-	 * @var bool $test_mode
-	 */
-	private $colours = array(
-		'Red'         => '#A60000',
-		'Orange'      => '#FF7000',
-		'Apricot'     => '#FFD060',
-
-		'Blue'        => '#0020A0',
-		'LightBlue'   => '#3777CD',
-		'SkyBlue'     => '#B0C0EA',
-
-		'Brown'       => '#464000',
-		'LightBrown'  => '#948700',
-		'Yellow'      => '#FFE900',
-
-		'Green'       => '#007039',
-		'LightGreen'  => '#67C700',
-		'PaleGreen'   => '#B5F167',
-
-		'DeepPurple'  => '#620056',
-		'Purple'      => '#A1008D',
-		'LightPurple' => '#EDA4D6',
-
-		'Black'       => '#000000',
-		'Grey'        => '#737373',
-		'White'       => '#FFFFFF',
-	);
+class Bootstrap extends Plugin_Base {
+	use Config;
 
 	/**
 	 * Constructor.
@@ -70,7 +38,7 @@ class Init extends Base {
 		if ( ! is_admin() )
 			return;
 
-		add_action( 'admin_init', array( $this, 'activate_plugin' ) );
+		add_action( 'admin_init',         array( $this, 'activate_plugin' ) );
 		add_filter( 'wp_get_update_data', array( $this, 'set_update_data' ) );
 	}
 
@@ -88,33 +56,28 @@ class Init extends Base {
 	 * @global string $pagenow
 	 */
 	public function activate_plugin() {
-		// Ajax
-		if ( $this->activate_ajax() )
+		if ( $this->maybe_ajax() )
 			return;
 
-		// Plugin Pages
+		// If it's not on a plugins pages, terminate Plugin Manager
 		global $pagenow;
 		if ( $pagenow !== "plugins.php" )
 			return;
 
-		if ( !Database::is_tables_exist() )
+		// Create DB
+		if ( ! Database::is_tables_exist() )
 			Database::create_tables();
 
+		// Arrange DB
 		Database::remove_duplicate_plugins();
 		Database::update_plugins();
 
 		if ( ! Database::is_updated() )
 			Database::upgrade_from_normal_version();
 
-		// Deactivate Older Version
-		if ( defined( 'PIGPR_PLUGIN_NAME' ) ) {
-			deactivate_plugins( PIGPR_PLUGIN_DIR . PIGPR_PLUGIN_FILE_NAME );
-		}
-
-		// Set Vars
-		new Modal();
-		new Table();
-		new All_Plugins();
+		Modal::get_instance();
+		Table::get_instance();
+		All_Plugins::get_instance();
 
 		// Text Domain, Script, Style, and Redirection
 		add_action( 'plugins_loaded',        array( $this, 'load_text_domain' ) );
@@ -139,11 +102,11 @@ class Init extends Base {
 	 * @global bool   DOING_AJAX
 	 * @global string $_REQUEST['action'] Ajax Mode.
 	 */
-	private function activate_ajax() {
+	private function maybe_ajax() {
 		// AJAX
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['action'] ) && strstr( $_REQUEST['action'], 'Plugin Manager Pro' ) !== false ) {
-			check_ajax_referer( PLGINMNGRPRO_TEXTDOMAIN, 'security' );
-			new Ajax();
+			check_ajax_referer( SUJIN_PLUGIN_MGR_SLUG, 'security' );
+			Ajax::get_instance();
 
 			return true;
 		}
@@ -157,13 +120,13 @@ class Init extends Base {
 	 * @since  0.0.1
 	 * @access public
 	 *
-	 * @global string PLGINMNGRPRO_PLUGIN_NAME
+	 * @global string SUJIN_PLUGIN_MGR_BASE_NAME
 	 *
 	 * @return void
 	 */
 	public function load_text_domain() {
-		$lang_dir = PLGINMNGRPRO_PLUGIN_NAME . '/languages';
-		load_plugin_textdomain( PLGINMNGRPRO_TEXTDOMAIN, 'wp-content/plugins/' . $lang_dir, $lang_dir );
+		$lang_dir = SUJIN_PLUGIN_MGR_BASE_NAME . '/languages';
+		load_plugin_textdomain( SUJIN_PLUGIN_MGR_SLUG, 'wp-content/plugins/' . $lang_dir, $lang_dir );
 	}
 
 	/**
@@ -172,23 +135,23 @@ class Init extends Base {
 	 * @since  0.0.1
 	 * @access public
 	 *
-	 * @global string PLGINMNGRPRO_ASSETS_URL
-	 * @global string PLGINMNGRPRO_TEXTDOMAIN
-	 * @global string PLGINMNGRPRO_VERSION_NUM
+	 * @global string SUJIN_PLUGIN_MGR_URL
+	 * @global string SUJIN_PLUGIN_MGR_SLUG
+	 * @global string SUJIN_PLUGIN_MGR_VERSION
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( 'angular',                     PLGINMNGRPRO_ASSETS_URL . 'angular/angular.min.js' );
-		wp_enqueue_script( 'angular-drag-and-drop-lists', PLGINMNGRPRO_ASSETS_URL . 'angular/angular-drag-and-drop-lists.js', array( 'angular' ) );
-		wp_enqueue_script( 'angular-indeterminate',       PLGINMNGRPRO_ASSETS_URL . 'angular/angular-indeterminate.min.js'  , array( 'angular' ) );
+		wp_enqueue_script( 'angular',                     SUJIN_PLUGIN_MGR_URL . 'assets/angular/angular.min.js' );
+		wp_enqueue_script( 'angular-drag-and-drop-lists', SUJIN_PLUGIN_MGR_URL . 'assets/angular/angular-drag-and-drop-lists.js', array( 'angular' ) );
+		wp_enqueue_script( 'angular-indeterminate',       SUJIN_PLUGIN_MGR_URL . 'assets/angular/angular-indeterminate.min.js'  , array( 'angular' ) );
 
 		# Adding Grouping Actions on Dropdown Menu
-		$script_url = PLGINMNGRPRO_ASSETS_URL . 'dist/scripts/app.js';
-		$style_url  = PLGINMNGRPRO_ASSETS_URL . 'dist/css/style.css';
+		$script_url = SUJIN_PLUGIN_MGR_URL . 'assets/dist/scripts/app.js';
+		$style_url  = SUJIN_PLUGIN_MGR_URL . 'assets/dist/css/style.css';
 
-		wp_enqueue_script( PLGINMNGRPRO_TEXTDOMAIN, $script_url, array(  ), PLGINMNGRPRO_VERSION_NUM );
-		wp_enqueue_style(  PLGINMNGRPRO_TEXTDOMAIN, $style_url,  array(), PLGINMNGRPRO_VERSION_NUM );
+		wp_enqueue_script( SUJIN_PLUGIN_MGR_SLUG, $script_url, array(  ), SUJIN_PLUGIN_MGR_VERSION );
+		wp_enqueue_style(  SUJIN_PLUGIN_MGR_SLUG, $style_url,  array(), SUJIN_PLUGIN_MGR_VERSION );
 
 		/**
 		 * Localization.
@@ -197,26 +160,26 @@ class Init extends Base {
 		 */
 		// Localization // objectL10n.delete_group
 
-		wp_localize_script( PLGINMNGRPRO_TEXTDOMAIN, 'objectL10n', array(
+		wp_localize_script( SUJIN_PLUGIN_MGR_SLUG, 'objectL10n', array(
 			'message'  => array(
-				'text_length' => __( 'Group name is empty.',  PLGINMNGRPRO_TEXTDOMAIN ),
-				'something'   => __( 'Something went wrong.', PLGINMNGRPRO_TEXTDOMAIN ),
+				'text_length' => __( 'Group name is empty.',  SUJIN_PLUGIN_MGR_SLUG ),
+				'something'   => __( 'Something went wrong.', SUJIN_PLUGIN_MGR_SLUG ),
 			),
 
 			'terms'    => array(
-				'group'  => __( 'Group',  PLGINMNGRPRO_TEXTDOMAIN ),
-				'lock'   => __( 'Lock',   PLGINMNGRPRO_TEXTDOMAIN ),
-				'unlock' => __( 'Unlock', PLGINMNGRPRO_TEXTDOMAIN ),
-				'hide'   => __( 'Hide',   PLGINMNGRPRO_TEXTDOMAIN ),
-				'unhide' => __( 'Unhide', PLGINMNGRPRO_TEXTDOMAIN ),
+				'group'  => __( 'Group',  SUJIN_PLUGIN_MGR_SLUG ),
+				'lock'   => __( 'Lock',   SUJIN_PLUGIN_MGR_SLUG ),
+				'unlock' => __( 'Unlock', SUJIN_PLUGIN_MGR_SLUG ),
+				'hide'   => __( 'Hide',   SUJIN_PLUGIN_MGR_SLUG ),
+				'unhide' => __( 'Unhide', SUJIN_PLUGIN_MGR_SLUG ),
 			),
 
-			'colours'      => $this->colours,
+			'colours'      => Colour::$COLOURS,
 			'settings'     => Option::get(),
 			'data'         => Database::get_json_array( $this->group ),
 			'plugin_group' => $this->group,
 
-			'nonce'        => wp_create_nonce( PLGINMNGRPRO_TEXTDOMAIN ),
+			'nonce'        => wp_create_nonce( SUJIN_PLUGIN_MGR_SLUG ),
 		));
 	}
 
@@ -235,7 +198,7 @@ class Init extends Base {
 	public function print_colour_style() {
 		?>
 		<style>
-			<?php foreach( $this->colours as $key => $colour ) : ?>
+			<?php foreach( Colour::$COLOURS as $key => $colour ) : ?>
 			.<?php echo $key ?> {
 				background-color: <?php echo $colour ?> !important;
 				border-color    : <?php echo $colour ?> !important;

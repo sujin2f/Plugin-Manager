@@ -10,7 +10,9 @@
  * @author      Sujin 수진 Choi http://www.sujinc.com/
 */
 
-namespace PLGINMNGRPRO;
+namespace Sujin\Plugin\PluginMgr;
+
+use Sujin\Plugin\PluginMgr\Traits\Config;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -18,7 +20,9 @@ if ( !defined( "ABSPATH" ) ) {
 	exit();
 }
 
-class All_Plugins extends Base {
+class All_Plugins extends Plugin_Base {
+	use Config;
+
 	/**
 	 * Constructor.
 	 *

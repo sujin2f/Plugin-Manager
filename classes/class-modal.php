@@ -1,16 +1,15 @@
 <?php
 /**
- * Modal
+ * Modal Controller
  *
- * Manage modal.
- *
- * @package     WordPress
- * @subpackage  Plugin Manager PRO
- * @since       0.0.1
- * @author      Sujin 수진 Choi http://www.sujinc.com/
+ * @package Plugin Manager
+ * @since   6.0.0
+ * @author  Sujin 수진 Choi http://www.sujinc.com/donation
 */
 
-namespace PLGINMNGRPRO;
+namespace Sujin\Plugin\PluginMgr;
+
+use Sujin\Plugin\PluginMgr\Traits\Config;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -19,6 +18,8 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class Modal {
+	use Config;
+
 	/**
 	 * Constructor.
 	 *
@@ -38,6 +39,6 @@ class Modal {
 	 * @access public
 	 */
 	public function print_modal() {
-		include_once( PLGINMNGRPRO_TEMPLATE_DIR . 'modal.php' );
+		include_once( SUJIN_PLUGIN_MGR_PATH . '/templates/modal.php' );
 	}
 }

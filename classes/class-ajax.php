@@ -1,16 +1,15 @@
 <?php
 /**
- * Ajax
+ * Ajax Controller
  *
- * Ajax Requests.
- *
- * @package     WordPress
- * @subpackage  Plugin Manager PRO
- * @since       0.0.1
- * @author      Sujin 수진 Choi http://www.sujinc.com/
+ * @package Plugin Manager
+ * @since   6.0.0
+ * @author  Sujin 수진 Choi http://www.sujinc.com/donation
 */
 
-namespace PLGINMNGRPRO;
+namespace Sujin\Plugin\PluginMgr;
+
+use Sujin\Plugin\PluginMgr\Traits\Config;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -19,6 +18,8 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class Ajax {
+	use Config;
+
 	/*
 	 * Constructor.
 	 *
@@ -41,7 +42,7 @@ class Ajax {
 		add_action( 'wp_ajax_Plugin Manager Pro : Edit Group',               array( $this, 'exercute_ajax_reauest' ) );
 		add_action( 'wp_ajax_Plugin Manager Pro : Set Order',                array( $this, 'exercute_ajax_reauest' ) );
 
-		add_action( 'wp_ajax_Plugin Manager Pro : Update Settings',          array( 'PLGINMNGRPRO\Option',  'set' ) );
+		add_action( 'wp_ajax_Plugin Manager Pro : Update Settings',          array( 'Sujin\Plugin\PluginMgr\Option',  'set' ) );
 	}
 
 	/**

@@ -1,16 +1,15 @@
 <?php
 /**
- * Option
+ * Option Controller
  *
- * Manage Options
- *
- * @package     WordPress
- * @subpackage  Plugin Manager PRO
- * @since       0.0.1
- * @author      Sujin 수진 Choi http://www.sujinc.com/
+ * @package Plugin Manager
+ * @since   6.0.0
+ * @author  Sujin 수진 Choi http://www.sujinc.com/donation
 */
 
-namespace PLGINMNGRPRO;
+namespace Sujin\Plugin\PluginMgr;
+
+use Sujin\Plugin\PluginMgr\Traits\Config;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -19,6 +18,8 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class Option {
+	use Config;
+
 	/**
 	 * Option Key
 	 *

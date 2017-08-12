@@ -1,16 +1,15 @@
 <?php
 /**
- * Data
+ * Database Controller
  *
- * Manage Options
- *
- * @package     WordPress
- * @subpackage  Plugin Manager PRO
- * @since       0.0.1
- * @author      Sujin 수진 Choi http://www.sujinc.com/
+ * @package Plugin Manager
+ * @since   6.0.0
+ * @author  Sujin 수진 Choi http://www.sujinc.com/donation
 */
 
-namespace PLGINMNGRPRO;
+namespace Sujin\Plugin\PluginMgr;
+
+use Sujin\Plugin\PluginMgr\Traits\Config;
 
 if ( !defined( "ABSPATH" ) ) {
 	header( "Status: 403 Forbidden" );
@@ -19,6 +18,8 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 class Database {
+	use Config;
+
 	/**
 	 * Table Names
 	 *
@@ -30,13 +31,10 @@ class Database {
 	 * @const    string TBL_GROUPS
 	 * @const    string TBL_RELATION
 	 */
-	const TBL_PREFIX   = 'pgnmngr_';
+	const TBL_PREFIX   = 'plugin_manager_';
 	const TBL_PLUGINS  = 'plugins';
 	const TBL_GROUPS   = 'groups';
 	const TBL_RELATION = 'group_plugin';
-
-	const CREATED_DB_OPTION_NAME = 'plugin-manager-db-created';
-	const UPDATED_OPTION_NAME    = 'plugin-manager-db-updated';
 
 	/**
 	 * Get Json Array.
@@ -806,7 +804,7 @@ class Database {
 	 * @return void.
 	 */
 	public static function is_tables_exist() {
-		if ( get_option( self::CREATED_DB_OPTION_NAME ) )
+		if ( get_option( SUJIN_PLUGIN_MGR_VERSION_KEY ) )
 			return true;
 
 		global $wpdb;
@@ -829,7 +827,8 @@ class Database {
 	 */
 	public static function create_tables() {
 		global $wpdb;
-		$tbl = self::get_table_names();
+		$tbl     = self::get_table_names();
+		$blog_id = get_current_blog_id();
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
@@ -844,7 +843,7 @@ class Database {
 
 				PRIMARY KEY (`ID`),
 
-				CONSTRAINT `fk_Plugin_User`
+				CONSTRAINT `fk_Plugin_Use_{$blog_id}`
 					FOREIGN KEY(`user_id`)
 					REFERENCES {$wpdb->users}(`ID`)
 					ON UPDATE CASCADE ON DELETE CASCADE
@@ -865,7 +864,7 @@ class Database {
 
 				PRIMARY KEY (`ID`),
 
-				CONSTRAINT `fk_Groups_User`
+				CONSTRAINT `fk_Groups_User_{$blog_id}`
 					FOREIGN KEY(`user_id`)
 					REFERENCES {$wpdb->users}(`ID`)
 					ON UPDATE CASCADE ON DELETE CASCADE
@@ -880,19 +879,19 @@ class Database {
 
 				PRIMARY KEY (`plugin_id`, `group_id`),
 
-				CONSTRAINT `fk_Relation_Plugin`
+				CONSTRAINT `fk_Relation_Plugin_{$blog_id}`
 					FOREIGN KEY(`plugin_id`)
 					REFERENCES {$tbl['plugins']}(`ID`)
 					ON UPDATE CASCADE ON DELETE CASCADE,
 
-				CONSTRAINT `fk_Relation_Group`
+				CONSTRAINT `fk_Relation_Group_{$blog_id}`
 					FOREIGN KEY(`group_id`)
 					REFERENCES {$tbl['groups']}(`ID`)
 					ON UPDATE CASCADE ON DELETE CASCADE
 		    );";
 		dbDelta( $sql );
 
-		update_option( self::CREATED_DB_OPTION_NAME, PLGINMNGRPRO_VERSION_NUM );
+		update_option( SUJIN_PLUGIN_MGR_VERSION_KEY, SUJIN_PLUGIN_MGR_VERSION );
 	}
 
 	/**
@@ -947,57 +946,12 @@ class Database {
 		");
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	public static function is_updated() {
-		if ( get_option( self::UPDATED_OPTION_NAME ) )
+		if ( ! get_option( 'plugin_groups' ) )
 			return true;
 
 		return false;
 	}
-
 
 	/**
 	 * Upgrade.
@@ -1079,7 +1033,8 @@ class Database {
 			delete_option( 'groups_plugin_match' );
 		}
 
-		update_option( self::UPDATED_OPTION_NAME, true );
+		delete_option( 'PIGPR_VERSION_NUM' );
+
 		return;
 	}
 }

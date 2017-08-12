@@ -25,34 +25,34 @@ if ( !defined( "ABSPATH" ) ) {
 				<div id="buttons">
 					<!-- ! Groups -->
 					<section ng-show="status.mode == 'groups'">
-						<a href="" class="button" ng-click="modal.closeModal()"><?php _e( 'Close', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
-						<a href="" class="button button-primary" ng-click="fn.setMode( 'create' )"><?php _e( 'Create Group', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
+						<a href="" class="button" ng-click="modal.closeModal()"><?php _e( 'Close', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
+						<a href="" class="button button-primary" ng-click="fn.setMode( 'create' )"><?php _e( 'Create Group', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
 					</section>
 
 					<!-- ! Create Form -->
 					<section ng-show="status.mode == 'create'">
-						<a href="" class="button" ng-click="createForm.fn.closeForm()"><?php _e( 'Cancel', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
-						<a href="" class="button" ng-class="createForm.data.colour" ng-click="createForm.fn.createGroup()"><?php _e( 'Create', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
+						<a href="" class="button" ng-click="createForm.fn.closeForm()"><?php _e( 'Cancel', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
+						<a href="" class="button" ng-class="createForm.data.colour" ng-click="createForm.fn.createGroup()"><?php _e( 'Create', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
 					</section>
 
 					<!-- ! Tab::Group Edit -->
 					<section ng-show="status.mode == 'groups.edit'">
-						<a href="" class="button" ng-click="modal.closeModal()"><?php _e( 'Cancel', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
-						<a href="" class="button button-secondary" ng-click="fn.setMode( 'groups.delete.confirm' )"><?php _e( 'Delete', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
-						<a href="" class="button" ng-class="createForm.data.colour" ng-click="tabs.manage.fn.editGroup()"><?php _e( 'Save', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
+						<a href="" class="button" ng-click="modal.closeModal()"><?php _e( 'Cancel', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
+						<a href="" class="button button-secondary" ng-click="fn.setMode( 'groups.delete.confirm' )"><?php _e( 'Delete', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
+						<a href="" class="button" ng-class="createForm.data.colour" ng-click="tabs.manage.fn.editGroup()"><?php _e( 'Save', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
 					</section>
 
 					<!-- ! Tab::Group Delete -->
 					<section ng-show="status.mode == 'groups.delete.confirm'">
-						<p><?php _e( 'Do you really want to delete the group?', PLGINMNGRPRO_TEXTDOMAIN ) ?></p>
+						<p><?php _e( 'Do you really want to delete the group?', SUJIN_PLUGIN_MGR_SLUG ) ?></p>
 
-						<a href="" class="button" ng-click="fn.goBack()"><?php _e( 'Cancel', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
-						<a href="" class="button button-primary" ng-click="tabs.manage.fn.deleteGroup()"><?php _e( 'Delete', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
+						<a href="" class="button" ng-click="fn.goBack()"><?php _e( 'Cancel', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
+						<a href="" class="button button-primary" ng-click="tabs.manage.fn.deleteGroup()"><?php _e( 'Delete', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
 					</section>
 
 					<!-- ! Tab::Options -->
 					<section ng-show="status.mode == 'options'">
-						<a href="" class="button" ng-click="modal.closeModal()"><?php _e( 'Close', PLGINMNGRPRO_TEXTDOMAIN ) ?></a>
+						<a href="" class="button" ng-click="modal.closeModal()"><?php _e( 'Close', SUJIN_PLUGIN_MGR_SLUG ) ?></a>
 					</section>
 				</div>
 			</div>
@@ -83,13 +83,13 @@ if ( !defined( "ABSPATH" ) ) {
 					<section id="create-form" ng-show="status.mode == 'create' || status.mode == 'groups.edit' || status.mode == 'groups.delete.confirm'">
 						<h3>{{status.mode == 'create' ? 'Create Group' : 'Edit Group'}}</h3>
 
-						<input type="text" ng-model="createForm.data.name" placeholder="<?php _e( 'Group Name', PLGINMNGRPRO_TEXTDOMAIN ) ?>" />
+						<input type="text" ng-model="createForm.data.name" placeholder="<?php _e( 'Group Name', SUJIN_PLUGIN_MGR_SLUG ) ?>" />
 
-						<textarea ng-model="createForm.data.description" placeholder="<?php _e( 'Description', PLGINMNGRPRO_TEXTDOMAIN ) ?>"></textarea>
+						<textarea ng-model="createForm.data.description" placeholder="<?php _e( 'Description', SUJIN_PLUGIN_MGR_SLUG ) ?>"></textarea>
 
 						<label>
 							<input type="checkbox" ng-model="createForm.data.hidden_main" ng-checked="createForm.data.hidden_main" />
-							<?php _e( 'Hide this group from a main page', PLGINMNGRPRO_TEXTDOMAIN ) ?>
+							<?php _e( 'Hide this group from a main page', SUJIN_PLUGIN_MGR_SLUG ) ?>
 
 						</label>
 
@@ -106,7 +106,7 @@ if ( !defined( "ABSPATH" ) ) {
 					<section id="options" ng-show="status.mode == 'options'">
 						<label ng-for="tabs.options.formData.hide_text">
 							<input type="checkbox" ng-model="tabs.options.formData.hide_text" ng-checked="tabs.options.formData.hide_text" ng-click="tabs.options.fn.updateSettings()" />
-							<?php _e( 'Hide Link Text', PLGINMNGRPRO_TEXTDOMAIN ) ?>
+							<?php _e( 'Hide Link Text', SUJIN_PLUGIN_MGR_SLUG ) ?>
 						</label>
 					</section>
 

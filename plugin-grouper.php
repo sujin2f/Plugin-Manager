@@ -17,40 +17,35 @@ if ( !defined( "ABSPATH" ) ) {
 }
 
 # Definitions
-if ( !defined( 'PLGINMNGRPRO_PLUGIN_NAME' ) ) {
+if ( !defined( 'SUJIN_PLUGIN_MGR_BASE_NAME' ) ) {
 	$basename = trim( dirname( plugin_basename( __FILE__ ) ), '/' );
+
 	if ( !is_dir( WP_PLUGIN_DIR . '/' . $basename ) ) {
 		$basename = explode( '/', $basename );
 		$basename = array_pop( $basename );
 	}
 
-	define( 'PLGINMNGRPRO_PLUGIN_NAME', $basename );
+	define( 'SUJIN_PLUGIN_MGR_BASE_NAME', $basename );
 }
 
-if ( !defined( "PLGINMNGRPRO_PLUGIN_FILE_NAME" ) )
-	define( "PLGINMNGRPRO_PLUGIN_FILE_NAME", basename(__FILE__) );
+if ( !defined( "SUJIN_PLUGIN_MGR_NAME" ) )
+	define( "SUJIN_PLUGIN_MGR_NAME", "Plugin Manager" );
 
-if ( !defined( "PLGINMNGRPRO_TEXTDOMAIN" ) )
-	define( "PLGINMNGRPRO_TEXTDOMAIN", "plugin-manager" );
+if ( !defined( "SUJIN_PLUGIN_MGR_SLUG" ) )
+	define( "SUJIN_PLUGIN_MGR_SLUG", sanitize_title( SUJIN_PLUGIN_MGR_NAME ) );
 
-if ( !defined( 'PLGINMNGRPRO_PLUGIN_DIR' ) )
-	define( 'PLGINMNGRPRO_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . PLGINMNGRPRO_PLUGIN_NAME . '/' );
+if ( !defined( 'SUJIN_PLUGIN_MGR_PATH' ) )
+	define( 'SUJIN_PLUGIN_MGR_PATH', WP_PLUGIN_DIR . '/' . SUJIN_PLUGIN_MGR_BASE_NAME );
 
-if ( !defined( 'PLGINMNGRPRO_TEMPLATE_DIR' ) )
-	define( 'PLGINMNGRPRO_TEMPLATE_DIR', PLGINMNGRPRO_PLUGIN_DIR . 'templates/' );
+if ( !defined( 'SUJIN_PLUGIN_MGR_URL' ) )
+	define( 'SUJIN_PLUGIN_MGR_URL', plugin_dir_url( __FILE__ ) );
 
-if ( !defined( 'PLGINMNGRPRO_ASSETS_URL' ) )
-	define( 'PLGINMNGRPRO_ASSETS_URL', plugin_dir_url( __FILE__ ) . 'assets/' );
+if ( !defined( "SUJIN_PLUGIN_MGR_VERSION_KEY" ) )
+	define( "SUJIN_PLUGIN_MGR_VERSION_KEY", "SUJIN_PLUGIN_MGR_VERSION" );
 
-if ( !defined( 'PLGINMNGRPRO_VENDOR_URL' ) )
-	define( 'PLGINMNGRPRO_VENDOR_URL', plugin_dir_url( __FILE__ ) . 'vendors/' );
-
-if ( !defined( "PLGINMNGRPRO_VERSION_KEY" ) )
-	define( "PLGINMNGRPRO_VERSION_KEY", "PLGINMNGRPRO_version" );
-
-if ( !defined( "PLGINMNGRPRO_VERSION_NUM" ) )
-	define( "PLGINMNGRPRO_VERSION_NUM", "0.0.1" );
+if ( !defined( "SUJIN_PLUGIN_MGR_VERSION" ) )
+	define( "SUJIN_PLUGIN_MGR_VERSION", "6.0.0" );
 
 # 가는거야~!
-include_once( PLGINMNGRPRO_PLUGIN_DIR . "/autoload.php");
-$GLOBALS[ 'plugin-manager-pro' ] = new PLGINMNGRPRO\Init();
+include_once( "autoload.php" );
+Sujin\Plugin\PluginMgr\Bootstrap::get_instance();
