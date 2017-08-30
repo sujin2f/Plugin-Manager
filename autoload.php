@@ -4,7 +4,7 @@
  *
  * @author  Sujin 수진 Choi
  * @package plugin-manager
- * @version 6.0.0
+ * @version 6.0.1
  * @website http://www.sujinc.com/donation
  *
  * Licensed under The GPL License

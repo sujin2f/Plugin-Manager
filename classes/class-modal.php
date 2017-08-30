@@ -3,7 +3,7 @@
  * Modal Controller
  *
  * @package Plugin Manager
- * @since   6.0.0
+ * @since   6.0.1
  * @author  Sujin 수진 Choi http://www.sujinc.com/donation
 */
 

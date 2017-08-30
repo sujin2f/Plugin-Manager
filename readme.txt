@@ -4,7 +4,7 @@ Donate link: http://www.sujinc.com/donation
 Tags: plugin, group, category. manage, admin
 Requires at least: 4.2.2
 Tested up to: 4.8.1
-Stable tag: 6.0.0
+Stable tag: 6.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,9 @@ I believe you know everything already.
 1. Screenshot
 
 == Changelog ==
+= 6.0.1 =
+* Fix JavaScript Error
+
 = 6.0.0 =
 * Update User Interface
 * Using Angular to make it faster
