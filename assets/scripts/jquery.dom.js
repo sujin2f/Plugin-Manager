@@ -4,8 +4,10 @@ jQuery( document ).ready( function( $ ) {
   $( 'form' ).submit( function( e ) {
     var formData = new FormData( $( this )[0]);
 
-    $('body').append( '<form id="non-bindable-angular-form" ng-non-bindable method="post"></form>' );
-    $newForm = $( '#non-bindable-angular-form' );
+	if (!$('#non-bindable-angular-form')[0])
+	    $('body').append('<form id="non-bindable-angular-form" ng-non-bindable method="post"></form>');
+
+    var $newForm = $('#non-bindable-angular-form');
 
     for( var pair of formData.entries() ) {
       $newForm.append( '<input type="hidden" name="' + pair[0] + '" value="' + pair[1] + '" />' );
