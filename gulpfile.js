@@ -6,8 +6,6 @@ var gulp  = require('gulp'),
     cssnano = require('gulp-cssnano'),
     autoprefixer = require('gulp-autoprefixer'),
     sourcemaps = require('gulp-sourcemaps'),
-    jshint = require('gulp-jshint'),
-    stylish = require('jshint-stylish'),
     uglify = require('gulp-uglify'),
     concat = require('gulp-concat'),
     rename = require('gulp-rename'),
@@ -63,8 +61,6 @@ gulp.task('scripts', function() {
 	}))
 	.pipe(plumber())
 	.pipe(sourcemaps.init())
-	.pipe(jshint())
-	.pipe(jshint.reporter('jshint-stylish'))
 	.pipe(concat('app.js'))
 	.pipe(gulp.dest('./assets/dist/scripts'))
 	.pipe(rename({suffix: '.min'}))

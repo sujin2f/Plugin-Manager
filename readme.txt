@@ -3,8 +3,8 @@ Contributors: sujin2f
 Donate link: http://www.sujinc.com/donation
 Tags: plugin, group, category. manage, admin
 Requires at least: 4.2.2
-Tested up to: 4.8.1
-Stable tag: 6.0.1
+Tested up to: 4.9.6
+Stable tag: 6.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,10 @@ I believe you know everything already.
 1. Screenshot
 
 == Changelog ==
+= 6.0.2 =
+* Supports PHP7.2
+* Fix the button size issue
+
 = 6.0.1 =
 * Fix JavaScript Error
 

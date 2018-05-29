@@ -225,6 +225,10 @@ class Database {
 		global $wpdb;
 		$tbl = self::get_table_names();
 
+		if (!self::is_tables_exist()) {
+			return array();
+		}
+
 		$plugins = array();
 		$plugins_temp = $wpdb->get_results(
 			$wpdb->prepare( "SELECT * FROM {$tbl['plugins']} WHERE `user_id` = %d",
@@ -919,8 +923,7 @@ class Database {
 		global $wpdb;
 
 		$wp_plugins = array_keys( get_plugins() );
-		$plugins    = array_map( create_function( '$value', 'return $value["file_name"];' ), self::get_plugins() );
-
+		$plugins    = array_map( 'self::get_plugin_filename', self::get_plugins() );
 		$diff_ext_wp   = array_diff( $wp_plugins, $plugins );
 		$diff_ext_this = array_diff( $plugins, $wp_plugins );
 
@@ -931,6 +934,10 @@ class Database {
  		foreach( $diff_ext_this as $plugin_file ) {
  			self::delete_plugin( $plugin_file );
  		}
+	}
+
+	private static function get_plugin_filename( $value ) {
+		return $value["file_name"];
 	}
 
 	/**

@@ -3,7 +3,7 @@
  * Plugin Name:   Plugin Manager
  * Plugin URI:    https://wordpress.org/plugins/plugin-grouper/
  * Description:   Too many plugins bothers you? Put them into group!
- * Version:       6.0.1
+ * Version:       6.0.2
  * Author:        Sujin 수진 Choi
  * Author URI:    http://www.sujinc.com/
  * License:       GPLv2 or later
